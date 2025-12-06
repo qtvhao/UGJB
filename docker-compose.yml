@@ -1,0 +1,279 @@
+services:
+  # API Gateway - Reverse Proxy
+  # Development: Proxies / to Vite dev server at host.docker.internal:3000
+  # Production: Web UI container serves static files on port 8010
+  api-gateway:
+    image: nginx:alpine
+    ports:
+      - '8080:80'
+    volumes:
+      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    networks:
+      - app-network
+    restart: unless-stopped
+    depends_on:
+      - metrics-collector
+      - kpi-engine
+      - insights-dashboard
+      - objective-service
+      - key-result-tracker
+      - employee-registry
+      - allocation-engine
+      - sprint-coordinator
+      - task-dispatcher
+      - data-pipeline
+      - api-gateway
+      - wellbeing-monitor
+      - burnout-predictor
+
+  # Web UI - Production Build
+  # Serves static files and proxies /api requests to api-gateway
+  webui:
+    build:
+      context: ./web/app
+      dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/webui:latest
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/webui:latest
+    ports:
+      - '8010:8010'
+    networks:
+      - app-network
+    restart: unless-stopped
+    depends_on:
+      - api-gateway
+
+  # Engineering-Analytics Bounded Context - Microservices
+  # MetricsCollector: Ingests raw engineering data from sources (version control, CI/CD)
+  metrics-collector:
+    build:
+      context: ./services/engineering-analytics/microservices/metrics-collector
+      dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/metrics-collector:latest
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/metrics-collector:latest
+    networks:
+      - app-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8001/health']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # KPIEngine: Calculates DORA metrics, code quality scores, and reliability indicators
+  kpi-engine:
+    build:
+      context: ./services/engineering-analytics/microservices/kpi-engine
+      dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/kpi-engine:latest
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/kpi-engine:latest
+    networks:
+      - app-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8002/health']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # InsightsDashboard: Serves visualization endpoints and pre-built reports
+  insights-dashboard:
+    build:
+      context: ./services/engineering-analytics/microservices/insights-dashboard
+      dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/insights-dashboard:latest
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/insights-dashboard:latest
+    networks:
+      - app-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8003/health']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Goal-Management Bounded Context - Microservices
+  # ObjectiveService: Manages lifecycle of objectives (create/update/archive)
+  objective-service:
+    build:
+      context: ./services/goal-management/microservices/objective-service
+      dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/objective-service:latest
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/objective-service:latest
+    networks:
+      - app-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8011/health']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # KeyResultTracker: Tracks progress against measurable results
+  key-result-tracker:
+    build:
+      context: ./services/goal-management/microservices/key-result-tracker
+      dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/key-result-tracker:latest
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/key-result-tracker:latest
+    networks:
+      - app-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8012/health']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # HR-Management Bounded Context - Microservices
+  # EmployeeRegistry: Central source for employee profiles and skills
+  employee-registry:
+    build:
+      context: ./services/hr-management/microservices/employee-registry
+      dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/employee-registry:latest
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/employee-registry:latest
+    networks:
+      - app-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8021/health']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # AllocationEngine: Optimizes workforce allocation across projects
+  allocation-engine:
+    build:
+      context: ./services/hr-management/microservices/allocation-engine
+      dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/allocation-engine:latest
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/allocation-engine:latest
+    networks:
+      - app-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8022/health']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Project-Management Bounded Context - Microservices
+  # SprintCoordinator: Manages sprint planning/execution
+  sprint-coordinator:
+    build:
+      context: ./services/project-management/microservices/sprint-coordinator
+      dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/sprint-coordinator:latest
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/sprint-coordinator:latest
+    networks:
+      - app-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8031/health']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # TaskDispatcher: Assigns tasks to team members based on skills/availability
+  task-dispatcher:
+    build:
+      context: ./services/project-management/microservices/task-dispatcher
+      dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/task-dispatcher:latest
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/task-dispatcher:latest
+    networks:
+      - app-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8032/health']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # System-Integration Bounded Context - Microservices
+  # DataPipeline: ETL processing for Jira/GitLab/Firebase
+  data-pipeline:
+    build:
+      context: ./services/system-integration/microservices/data-pipeline
+      dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/data-pipeline:latest
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/data-pipeline:latest
+    networks:
+      - app-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8041/health']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # API Gateway: Unified entry point with routing/security
+  api-gateway:
+    build:
+      context: ./services/system-integration/microservices/api-gateway
+      dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/api-gateway:latest
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/api-gateway:latest
+    networks:
+      - app-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8042/health']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Workforce-Wellbeing Bounded Context - Microservices
+  # WellbeingMonitor: Collects wellbeing indicators (surveys, activity logs)
+  wellbeing-monitor:
+    build:
+      context: ./services/workforce-wellbeing/microservices/wellbeing-monitor
+      dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/wellbeing-monitor:latest
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/wellbeing-monitor:latest
+    networks:
+      - app-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8051/health']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # BurnoutPredictor: Identifies burnout risks using ML models
+  burnout-predictor:
+    build:
+      context: ./services/workforce-wellbeing/microservices/burnout-predictor
+      dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/burnout-predictor:latest
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/burnout-predictor:latest
+    networks:
+      - app-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8052/health']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+
+networks:
+  app-network:
+    driver: bridge

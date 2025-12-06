@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Fuel2 Starter - Launch VS Code with the Fuel2 project
+# This script opens Visual Studio Code with the fuel2-starter project directory
+
+# Project path (relative to the location of this app bundle)
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PROJECT_PATH="$SCRIPT_DIR/../../.."
+
+# Check if VS Code is installed
+if ! command -v code &> /dev/null; then
+    # Try to find VS Code in the standard Applications folder
+    if [ -f "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" ]; then
+        CODE_PATH="/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code"
+    else
+        osascript -e 'display dialog "Visual Studio Code is not installed or not in PATH.\n\nPlease install VS Code or add it to your PATH." buttons {"OK"} default button "OK" with icon stop'
+        exit 1
+    fi
+else
+    CODE_PATH="code"
+fi
+
+# Open VS Code with the project
+"$CODE_PATH" "$PROJECT_PATH"
+
+# Exit successfully
+exit 0

@@ -1,0 +1,178 @@
+{
+  "version": "2.0",
+  "generated_at": "2025-12-06T17:54:10.475677",
+  "services": [
+    {
+      "name": "Engineering-Analytics",
+      "service_name": "engineering-analytics",
+      "directory": "services/engineering-analytics",
+      "port": 8001,
+      "health_endpoint": "http://localhost:8001/health",
+      "domain_responsibility": "Monitoring, analyzing, and reporting engineering performance metrics, code quality, system reliability, and DORA KPIs.",
+      "libraries_frameworks": [],
+      "microservices": [
+        {
+          "name": "MetricsCollector",
+          "responsibility": "Ingests raw engineering data from sources (version control, CI/CD)",
+          "technology": "Python 3.11, FastAPI, Pandas, Pydantic",
+          "data_ownership": "Time-series database (InfluxDB)",
+          "dependencies": [],
+          "endpoints": []
+        },
+        {
+          "name": "KPIEngine",
+          "responsibility": "Calculates DORA metrics, code quality scores, and reliability indicators",
+          "technology": "Python 3.11, PySpark, scikit-learn, Protobuf",
+          "data_ownership": "Analytical database (ClickHouse)",
+          "dependencies": [],
+          "endpoints": []
+        },
+        {
+          "name": "InsightsDashboard",
+          "responsibility": "Serves visualization endpoints and pre-built reports",
+          "technology": "TypeScript, React, GraphQL, Apollo Server",
+          "data_ownership": "Read-optimized cache (Redis)",
+          "dependencies": [],
+          "endpoints": []
+        }
+      ]
+    },
+    {
+      "name": "Goal-Management",
+      "service_name": "goal-management",
+      "directory": "services/goal-management",
+      "port": 8002,
+      "health_endpoint": "http://localhost:8002/health",
+      "domain_responsibility": "Defining, tracking, and evaluating organizational/individual OKRs.",
+      "libraries_frameworks": [],
+      "microservices": [
+        {
+          "name": "ObjectiveService",
+          "responsibility": "Manages lifecycle of objectives (create/update/archive)",
+          "technology": "TypeScript, NestJS, TypeORM",
+          "data_ownership": "PostgreSQL (ACID-compliant)",
+          "dependencies": [],
+          "endpoints": []
+        },
+        {
+          "name": "KeyResultTracker",
+          "responsibility": "Tracks progress against measurable results",
+          "technology": "TypeScript, NestJS, BullMQ (queues)",
+          "data_ownership": "PostgreSQL",
+          "dependencies": [],
+          "endpoints": []
+        }
+      ]
+    },
+    {
+      "name": "HR-Management",
+      "service_name": "hr-management",
+      "directory": "services/hr-management",
+      "port": 8003,
+      "health_endpoint": "http://localhost:8003/health",
+      "domain_responsibility": "Managing employee lifecycle, skills tracking, workforce allocation, and performance.",
+      "libraries_frameworks": [],
+      "microservices": [
+        {
+          "name": "EmployeeRegistry",
+          "responsibility": "Central source for employee profiles and skills",
+          "technology": "Java 17, Spring Boot, Hibernate",
+          "data_ownership": "PostgreSQL with JSONB column",
+          "dependencies": [],
+          "endpoints": []
+        },
+        {
+          "name": "AllocationEngine",
+          "responsibility": "Optimizes workforce allocation across projects",
+          "technology": "Kotlin, Spring Boot, jgrapht (graph algorithms)",
+          "data_ownership": "PostgreSQL",
+          "dependencies": [],
+          "endpoints": []
+        }
+      ]
+    },
+    {
+      "name": "Project-Management",
+      "service_name": "project-management",
+      "directory": "services/project-management",
+      "port": 8004,
+      "health_endpoint": "http://localhost:8004/health",
+      "domain_responsibility": "Managing project lifecycles, sprints, tasks, and resource coordination.",
+      "libraries_frameworks": [],
+      "microservices": [
+        {
+          "name": "SprintCoordinator",
+          "responsibility": "Manages sprint planning/execution",
+          "technology": "TypeScript, NestJS, TypeORM",
+          "data_ownership": "PostgreSQL",
+          "dependencies": [],
+          "endpoints": []
+        },
+        {
+          "name": "TaskDispatcher",
+          "responsibility": "Assigns tasks to team members based on skills/availability",
+          "technology": "TypeScript, NestJS, BullMQ",
+          "data_ownership": "PostgreSQL",
+          "dependencies": [],
+          "endpoints": []
+        }
+      ]
+    },
+    {
+      "name": "System-Integration",
+      "service_name": "system-integration",
+      "directory": "services/system-integration",
+      "port": 8005,
+      "health_endpoint": "http://localhost:8005/health",
+      "domain_responsibility": "Synchronizing data across internal/external systems.",
+      "libraries_frameworks": [],
+      "microservices": [
+        {
+          "name": "DataPipeline",
+          "responsibility": "ETL processing for Jira/GitLab/Firebase",
+          "technology": "Kotlin, Apache Camel, Kafka Streams",
+          "data_ownership": "Schema registry, dead-letter queue",
+          "dependencies": [],
+          "endpoints": []
+        },
+        {
+          "name": "API Gateway",
+          "responsibility": "Unified entry point with routing/security",
+          "technology": "Go, Gin, OPA (authorization)",
+          "data_ownership": "None (stateless)",
+          "dependencies": [],
+          "endpoints": []
+        }
+      ]
+    },
+    {
+      "name": "Workforce-Wellbeing",
+      "service_name": "workforce-wellbeing",
+      "directory": "services/workforce-wellbeing",
+      "port": 8006,
+      "health_endpoint": "http://localhost:8006/health",
+      "domain_responsibility": "Monitoring burnout risks and team health.",
+      "libraries_frameworks": [],
+      "microservices": [
+        {
+          "name": "WellbeingMonitor",
+          "responsibility": "Collects wellbeing indicators (surveys, activity logs)",
+          "technology": "Python 3.11, FastAPI, Pydantic",
+          "data_ownership": "Time-series database (TimescaleDB)",
+          "dependencies": [],
+          "endpoints": []
+        },
+        {
+          "name": "BurnoutPredictor",
+          "responsibility": "Identifies burnout risks using ML models",
+          "technology": "Python 3.11, scikit-learn, XGBoost, Protobuf",
+          "data_ownership": "ML model registry (MLflow)",
+          "dependencies": [],
+          "endpoints": []
+        }
+      ]
+    }
+  ],
+  "total_services": 6,
+  "total_microservices": 13
+}
