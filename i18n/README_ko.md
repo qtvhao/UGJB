@@ -162,7 +162,7 @@ MIT 라이선스 - 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세
 
 ## 지원
 
-- **문서**: 자세한 아키텍처 및 구현 가이드는 `docs/` 디렉토리를 참조하세요
+- **문서**: 자세한 아키텍처 및 구현 가이드는 comprehensive guides 디렉토리를 참조하세요
 - **이슈**: [GitHub Issues](https://github.com/qtvhao/UGJB/issues)에서 문제 제출
 - **기여**: Pull Requests를 환영합니다! 먼저 기여 가이드를 읽어주세요
 

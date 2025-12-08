@@ -162,7 +162,7 @@ MIT 许可证 - 详见 [LICENSE](LICENSE) 文件。
 
 ## 支持
 
-- **文档**: 查阅 `docs/` 目录获取详细的架构和实现指南
+- **文档**: 查阅 comprehensive guides 目录获取详细的架构和实现指南
 - **问题**: 在 [GitHub Issues](https://github.com/qtvhao/UGJB/issues) 提交问题
 - **贡献**: 欢迎 Pull Requests！请先阅读我们的贡献指南
 

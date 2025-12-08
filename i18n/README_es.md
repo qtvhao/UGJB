@@ -162,7 +162,7 @@ Licencia MIT - ver archivo [LICENSE](LICENSE) para más detalles.
 
 ## Soporte
 
-- **Documentación**: Consulte el directorio `docs/` para guías detalladas de arquitectura e implementación
+- **Documentación**: Consulte el directorio comprehensive guides para guías detalladas de arquitectura e implementación
 - **Issues**: Envíe problemas en [GitHub Issues](https://github.com/qtvhao/UGJB/issues)
 - **Contribuciones**: ¡Los Pull Requests son bienvenidos! Por favor, lea primero nuestra guía de contribución
 

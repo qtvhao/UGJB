@@ -254,7 +254,7 @@ You are free to use, modify, and distribute UGJB for personal or commercial purp
 
 ### Get Help
 
-- 📖 **Documentation**: Comprehensive guides in `docs/` covering architecture, deployment, and implementation
+- 📖 **Documentation**: Comprehensive guides covering architecture, deployment, and implementation
 - 🐛 **Issues**: Report bugs or request features at [GitHub Issues](https://github.com/qtvhao/UGJB/issues)
 - 💬 **Discussions**: Join the community at [GitHub Discussions](https://github.com/qtvhao/UGJB/discussions)
 
@@ -280,9 +280,9 @@ Please read our [Contributing Guide](CONTRIBUTING.md) to get started.
 
 ### For Decision-Makers
 
-- **ROI Calculator**: Use `docs/strategy/product-vision.md` to model your 3-year TCO vs. SaaS alternatives
+- **ROI Calculator**: Model your 3-year TCO vs. SaaS alternatives using the product vision documentation
 - **Pilot Program**: Start with HR Management + Engineering Analytics contexts (2–4 weeks to value)
-- **Vendor Comparison**: See `docs/modeling_design/domain-model/Context-Summary.md` for UGJB vs. Monday.com + DevLake vs. Lattice + LinearB
+- **Vendor Comparison**: Compare UGJB vs. Monday.com + DevLake vs. Lattice + LinearB using the domain model context summary
 
 ---
 

@@ -162,7 +162,7 @@ MIT 授權 - 詳見 [LICENSE](LICENSE) 檔案。
 
 ## 支援
 
-- **文件**: 查閱 `docs/` 目錄取得詳細的架構和實作指南
+- **文件**: 查閱 comprehensive guides 目錄取得詳細的架構和實作指南
 - **問題**: 在 [GitHub Issues](https://github.com/qtvhao/UGJB/issues) 提交問題
 - **貢獻**: 歡迎 Pull Requests！請先閱讀我們的貢獻指南
 
