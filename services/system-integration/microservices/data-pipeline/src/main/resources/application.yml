@@ -1,0 +1,115 @@
+server:
+  port: 8061
+  shutdown: graceful
+
+spring:
+  application:
+    name: data-pipeline-service
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/system_integration_db
+      auto-index-creation: true
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: data-pipeline-consumer-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      enable-auto-commit: false
+      properties:
+        isolation.level: read_committed
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      retries: 3
+      properties:
+        enable.idempotence: true
+    streams:
+      application-id: data-pipeline-streams
+      properties:
+        default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+        default.value.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+        num.stream.threads: 2
+
+# Apache Camel Configuration
+camel:
+  springboot:
+    name: DataPipelineContext
+    main-run-controller: true
+  component:
+    kafka:
+      brokers: localhost:9092
+    mongodb:
+      mongo-connection: mongodb://localhost:27017
+
+# Integration Configuration
+integration:
+  jira:
+    base-url: ${JIRA_BASE_URL:https://your-domain.atlassian.net}
+    api-token: ${JIRA_API_TOKEN:changeme}
+    username: ${JIRA_USERNAME:user@example.com}
+    poll-interval: ${JIRA_POLL_INTERVAL:60000}
+    projects: ${JIRA_PROJECTS:}
+
+  gitlab:
+    base-url: ${GITLAB_BASE_URL:https://gitlab.com}
+    api-token: ${GITLAB_API_TOKEN:changeme}
+    poll-interval: ${GITLAB_POLL_INTERVAL:60000}
+    groups: ${GITLAB_GROUPS:}
+
+  firebase:
+    project-id: ${FIREBASE_PROJECT_ID:your-project}
+    credentials-path: ${FIREBASE_CREDENTIALS_PATH:}
+    collection: ${FIREBASE_COLLECTION:events}
+
+# Kafka Topics
+kafka:
+  topics:
+    jira-events: jira.events
+    gitlab-events: gitlab.events
+    firebase-events: firebase.events
+    transformed-data: integration.transformed.data
+    dead-letter: integration.dlq
+
+# Management and Monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,camel
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    export:
+      prometheus:
+        enabled: true
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.ugjb.integration: DEBUG
+    org.apache.camel: INFO
+    org.springframework.kafka: INFO
+    org.springframework.data.mongodb: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Graceful Shutdown
+spring.lifecycle.timeout-per-shutdown-phase: 30s

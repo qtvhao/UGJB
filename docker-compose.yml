@@ -1,50 +1,41 @@
 services:
-  # API Gateway - Reverse Proxy
+  # Nginx Reverse Proxy - Main Entry Point
   # Development: Proxies / to Vite dev server at host.docker.internal:3000
   # Production: Web UI container serves static files on port 8010
-  api-gateway:
+  nginx-proxy:
     image: nginx:alpine
     ports:
-      - '8080:80'
+      - '8081:80'
     volumes:
       - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infrastructure/nginx/proxy_params:/etc/nginx/proxy_params:ro
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     networks:
       - app-network
     restart: unless-stopped
-    depends_on:
-      - metrics-collector
-      - kpi-engine
-      - insights-dashboard
-      - objective-service
-      - key-result-tracker
-      - employee-registry
-      - allocation-engine
-      - sprint-coordinator
-      - task-dispatcher
-      - data-pipeline
-      - api-gateway
-      - wellbeing-monitor
-      - burnout-predictor
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:80/health']
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
   # Web UI - Production Build
-  # Serves static files and proxies /api requests to api-gateway
+  # Serves static files built with Vite
   webui:
     build:
       context: ./web/app
       dockerfile: Dockerfile
-      cache_from:
-        - type=registry,ref=host.docker.internal:5006/webui:latest
-      cache_to:
-        - type=registry,ref=host.docker.internal:5006/webui:latest
     ports:
       - '8010:8010'
     networks:
       - app-network
     restart: unless-stopped
-    depends_on:
-      - api-gateway
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8010/']
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
   # Engineering-Analytics Bounded Context - Microservices
   # MetricsCollector: Ingests raw engineering data from sources (version control, CI/CD)
@@ -52,14 +43,10 @@ services:
     build:
       context: ./services/engineering-analytics/microservices/metrics-collector
       dockerfile: Dockerfile
-      cache_from:
-        - type=registry,ref=host.docker.internal:5006/metrics-collector:latest
-      cache_to:
-        - type=registry,ref=host.docker.internal:5006/metrics-collector:latest
     networks:
       - app-network
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:8001/health']
+      test: ['CMD', 'curl', '-f', 'http://localhost:8031/health']
       interval: 30s
       timeout: 5s
       retries: 3
@@ -69,14 +56,10 @@ services:
     build:
       context: ./services/engineering-analytics/microservices/kpi-engine
       dockerfile: Dockerfile
-      cache_from:
-        - type=registry,ref=host.docker.internal:5006/kpi-engine:latest
-      cache_to:
-        - type=registry,ref=host.docker.internal:5006/kpi-engine:latest
     networks:
       - app-network
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:8002/health']
+      test: ['CMD', 'curl', '-f', 'http://localhost:8032/health']
       interval: 30s
       timeout: 5s
       retries: 3
@@ -86,14 +69,10 @@ services:
     build:
       context: ./services/engineering-analytics/microservices/insights-dashboard
       dockerfile: Dockerfile
-      cache_from:
-        - type=registry,ref=host.docker.internal:5006/insights-dashboard:latest
-      cache_to:
-        - type=registry,ref=host.docker.internal:5006/insights-dashboard:latest
     networks:
       - app-network
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:8003/health']
+      test: ['CMD', 'curl', '-f', 'http://localhost:8033/health']
       interval: 30s
       timeout: 5s
       retries: 3
@@ -104,14 +83,10 @@ services:
     build:
       context: ./services/goal-management/microservices/objective-service
       dockerfile: Dockerfile
-      cache_from:
-        - type=registry,ref=host.docker.internal:5006/objective-service:latest
-      cache_to:
-        - type=registry,ref=host.docker.internal:5006/objective-service:latest
     networks:
       - app-network
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:8011/health']
+      test: ['CMD', 'curl', '-f', 'http://localhost:8041/health']
       interval: 30s
       timeout: 5s
       retries: 3
@@ -121,14 +96,10 @@ services:
     build:
       context: ./services/goal-management/microservices/key-result-tracker
       dockerfile: Dockerfile
-      cache_from:
-        - type=registry,ref=host.docker.internal:5006/key-result-tracker:latest
-      cache_to:
-        - type=registry,ref=host.docker.internal:5006/key-result-tracker:latest
     networks:
       - app-network
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:8012/health']
+      test: ['CMD', 'curl', '-f', 'http://localhost:8042/health']
       interval: 30s
       timeout: 5s
       retries: 3
@@ -139,10 +110,6 @@ services:
     build:
       context: ./services/hr-management/microservices/employee-registry
       dockerfile: Dockerfile
-      cache_from:
-        - type=registry,ref=host.docker.internal:5006/employee-registry:latest
-      cache_to:
-        - type=registry,ref=host.docker.internal:5006/employee-registry:latest
     networks:
       - app-network
     healthcheck:
@@ -156,10 +123,6 @@ services:
     build:
       context: ./services/hr-management/microservices/allocation-engine
       dockerfile: Dockerfile
-      cache_from:
-        - type=registry,ref=host.docker.internal:5006/allocation-engine:latest
-      cache_to:
-        - type=registry,ref=host.docker.internal:5006/allocation-engine:latest
     networks:
       - app-network
     healthcheck:
@@ -174,14 +137,10 @@ services:
     build:
       context: ./services/project-management/microservices/sprint-coordinator
       dockerfile: Dockerfile
-      cache_from:
-        - type=registry,ref=host.docker.internal:5006/sprint-coordinator:latest
-      cache_to:
-        - type=registry,ref=host.docker.internal:5006/sprint-coordinator:latest
     networks:
       - app-network
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:8031/health']
+      test: ['CMD', 'curl', '-f', 'http://localhost:8051/health']
       interval: 30s
       timeout: 5s
       retries: 3
@@ -191,14 +150,10 @@ services:
     build:
       context: ./services/project-management/microservices/task-dispatcher
       dockerfile: Dockerfile
-      cache_from:
-        - type=registry,ref=host.docker.internal:5006/task-dispatcher:latest
-      cache_to:
-        - type=registry,ref=host.docker.internal:5006/task-dispatcher:latest
     networks:
       - app-network
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:8032/health']
+      test: ['CMD', 'curl', '-f', 'http://localhost:8052/health']
       interval: 30s
       timeout: 5s
       retries: 3
@@ -209,31 +164,25 @@ services:
     build:
       context: ./services/system-integration/microservices/data-pipeline
       dockerfile: Dockerfile
-      cache_from:
-        - type=registry,ref=host.docker.internal:5006/data-pipeline:latest
-      cache_to:
-        - type=registry,ref=host.docker.internal:5006/data-pipeline:latest
     networks:
       - app-network
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:8041/health']
+      test: ['CMD', 'curl', '-f', 'http://localhost:8061/health']
       interval: 30s
       timeout: 5s
       retries: 3
 
-  # API Gateway: Unified entry point with routing/security
-  api-gateway:
+  # API Gateway Service: Unified entry point with routing/security (Go/Gin)
+  api-gateway-service:
     build:
       context: ./services/system-integration/microservices/api-gateway
       dockerfile: Dockerfile
-      cache_from:
-        - type=registry,ref=host.docker.internal:5006/api-gateway:latest
-      cache_to:
-        - type=registry,ref=host.docker.internal:5006/api-gateway:latest
+    ports:
+      - '8080:8060'
     networks:
       - app-network
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:8042/health']
+      test: ['CMD', 'curl', '-f', 'http://localhost:8060/health']
       interval: 30s
       timeout: 5s
       retries: 3
@@ -244,14 +193,10 @@ services:
     build:
       context: ./services/workforce-wellbeing/microservices/wellbeing-monitor
       dockerfile: Dockerfile
-      cache_from:
-        - type=registry,ref=host.docker.internal:5006/wellbeing-monitor:latest
-      cache_to:
-        - type=registry,ref=host.docker.internal:5006/wellbeing-monitor:latest
     networks:
       - app-network
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:8051/health']
+      test: ['CMD', 'curl', '-f', 'http://localhost:8071/health']
       interval: 30s
       timeout: 5s
       retries: 3
@@ -261,14 +206,38 @@ services:
     build:
       context: ./services/workforce-wellbeing/microservices/burnout-predictor
       dockerfile: Dockerfile
-      cache_from:
-        - type=registry,ref=host.docker.internal:5006/burnout-predictor:latest
-      cache_to:
-        - type=registry,ref=host.docker.internal:5006/burnout-predictor:latest
     networks:
       - app-network
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:8052/health']
+      test: ['CMD', 'curl', '-f', 'http://localhost:8072/health']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Unified-Analytics Bounded Context - Microservices
+  # UnifiedAnalyticsAPI: Dashboard config, incident attribution, performance reviews, platform sync
+  unified-analytics-api:
+    build:
+      context: ./services/unified-analytics/microservices/unified-analytics-api
+      dockerfile: Dockerfile
+    ports:
+      - '8090:8000'
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/unified_analytics
+      - EMPLOYEE_REGISTRY_URL=http://employee-registry:8021
+      - METRICS_COLLECTOR_URL=http://metrics-collector:8031
+      - LATTICE_API_URL=${LATTICE_API_URL:-}
+      - LATTICE_API_KEY=${LATTICE_API_KEY:-}
+      - MONDAY_API_URL=${MONDAY_API_URL:-https://api.monday.com/v2}
+      - MONDAY_API_KEY=${MONDAY_API_KEY:-}
+      - DEVLAKE_API_URL=${DEVLAKE_API_URL:-}
+    networks:
+      - app-network
+    depends_on:
+      - employee-registry
+      - metrics-collector
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8000/health']
       interval: 30s
       timeout: 5s
       retries: 3

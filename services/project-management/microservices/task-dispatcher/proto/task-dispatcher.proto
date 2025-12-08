@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+package taskdispatcher;
+
+service TaskDispatcherService {
+  rpc CreateTask (CreateTaskRequest) returns (TaskResponse);
+  rpc GetTask (GetTaskRequest) returns (TaskResponse);
+  rpc UpdateTask (UpdateTaskRequest) returns (TaskResponse);
+  rpc AssignTask (AssignTaskRequest) returns (TaskResponse);
+  rpc UnassignTask (UnassignTaskRequest) returns (TaskResponse);
+  rpc GetTasksByAssignee (GetTasksByAssigneeRequest) returns (TaskListResponse);
+  rpc GetUnassignedTasks (GetUnassignedTasksRequest) returns (TaskListResponse);
+}
+
+message CreateTaskRequest {
+  string title = 1;
+  string description = 2;
+  string priority = 3;
+  string projectId = 4;
+  string sprintId = 5;
+  repeated string skillsRequired = 6;
+  int32 estimatedHours = 7;
+  string dueDate = 8;
+  string createdBy = 9;
+}
+
+message GetTaskRequest {
+  string id = 1;
+}
+
+message UpdateTaskRequest {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  string status = 4;
+  string priority = 5;
+  int32 estimatedHours = 6;
+  int32 actualHours = 7;
+  string updatedBy = 8;
+}
+
+message AssignTaskRequest {
+  string id = 1;
+  string assigneeId = 2;
+  string assigneeName = 3;
+  string assigneeEmail = 4;
+  string updatedBy = 5;
+}
+
+message UnassignTaskRequest {
+  string id = 1;
+  string updatedBy = 2;
+}
+
+message GetTasksByAssigneeRequest {
+  string assigneeId = 1;
+}
+
+message GetUnassignedTasksRequest {
+  string projectId = 1;
+}
+
+message TaskResponse {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  string status = 4;
+  string priority = 5;
+  string assigneeId = 6;
+  string assigneeName = 7;
+  string assigneeEmail = 8;
+  string projectId = 9;
+  string sprintId = 10;
+  repeated string skillsRequired = 11;
+  int32 estimatedHours = 12;
+  int32 actualHours = 13;
+  string dueDate = 14;
+  string createdAt = 15;
+  string updatedAt = 16;
+}
+
+message TaskListResponse {
+  repeated TaskResponse tasks = 1;
+  int32 total = 2;
+}

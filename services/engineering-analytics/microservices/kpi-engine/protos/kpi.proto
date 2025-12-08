@@ -1,0 +1,138 @@
+syntax = "proto3";
+
+package com.ugjb.analytics.kpi;
+
+option python_generic_services = true;
+
+// KPI Engine gRPC Service
+service KPIService {
+  // Calculate DORA metrics for a repository
+  rpc CalculateDORAMetrics(DORAMetricsRequest) returns (DORAMetricsResponse);
+
+  // Calculate code quality score
+  rpc CalculateQualityScore(QualityScoreRequest) returns (QualityScoreResponse);
+
+  // Calculate reliability indicators
+  rpc CalculateReliabilityScore(ReliabilityScoreRequest) returns (ReliabilityScoreResponse);
+
+  // Get employee KPI summary
+  rpc GetEmployeeKPIs(EmployeeKPIRequest) returns (EmployeeKPIResponse);
+
+  // Get team KPI aggregates
+  rpc GetTeamKPIs(TeamKPIRequest) returns (TeamKPIResponse);
+
+  // Check threshold breaches
+  rpc CheckThresholdBreaches(ThresholdCheckRequest) returns (ThresholdCheckResponse);
+}
+
+message DORAMetricsRequest {
+  string repository_id = 1;
+  string period_start = 2;
+  string period_end = 3;
+}
+
+message DORAMetricsResponse {
+  string repository_id = 1;
+  double deployment_frequency = 2;
+  double lead_time_for_changes = 3;
+  double change_failure_rate = 4;
+  double mean_time_to_recovery = 5;
+  string period_start = 6;
+  string period_end = 7;
+  string calculated_at = 8;
+}
+
+message QualityScoreRequest {
+  string repository_id = 1;
+  optional string employee_id = 2;
+  string period_start = 3;
+  string period_end = 4;
+}
+
+message QualityScoreResponse {
+  string repository_id = 1;
+  double overall_score = 2;
+  double code_coverage = 3;
+  double technical_debt_ratio = 4;
+  double bug_density = 5;
+  double code_complexity = 6;
+  string calculated_at = 7;
+}
+
+message ReliabilityScoreRequest {
+  string service_id = 1;
+  string period_start = 2;
+  string period_end = 3;
+}
+
+message ReliabilityScoreResponse {
+  string service_id = 1;
+  double overall_score = 2;
+  double uptime_percentage = 3;
+  double incident_frequency = 4;
+  double error_rate = 5;
+  double latency_p99 = 6;
+  string calculated_at = 7;
+}
+
+message EmployeeKPIRequest {
+  string employee_id = 1;
+  string period = 2;  // week, sprint, month
+  optional string period_start = 3;
+  optional string period_end = 4;
+}
+
+message EmployeeKPIResponse {
+  string employee_id = 1;
+  string period = 2;
+  string period_start = 3;
+  string period_end = 4;
+  int32 commits = 5;
+  int32 pull_requests_opened = 6;
+  int32 pull_requests_closed = 7;
+  int32 code_reviews = 8;
+  int32 issues_completed = 9;
+  double average_lead_time = 10;
+  double average_cycle_time = 11;
+  double quality_score = 12;
+  double productivity_score = 13;
+}
+
+message TeamKPIRequest {
+  string team_id = 1;
+  string period = 2;
+  optional string period_start = 3;
+  optional string period_end = 4;
+}
+
+message TeamKPIResponse {
+  string team_id = 1;
+  string period = 2;
+  string period_start = 3;
+  string period_end = 4;
+  int32 total_commits = 5;
+  int32 total_pull_requests = 6;
+  int32 total_issues_completed = 7;
+  double average_velocity = 8;
+  double team_quality_score = 9;
+  double team_productivity_score = 10;
+  repeated EmployeeKPIResponse member_kpis = 11;
+}
+
+message ThresholdCheckRequest {
+  string entity_type = 1;  // employee, team, repository
+  string entity_id = 2;
+  string metric_type = 3;
+}
+
+message ThresholdCheckResponse {
+  string entity_type = 1;
+  string entity_id = 2;
+  string metric_type = 3;
+  double current_value = 4;
+  double threshold_value = 5;
+  bool is_breached = 6;
+  string breach_direction = 7;  // above, below
+  string severity = 8;  // info, warning, critical
+  string message = 9;
+}

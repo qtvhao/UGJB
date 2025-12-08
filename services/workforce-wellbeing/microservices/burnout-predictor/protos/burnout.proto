@@ -1,0 +1,142 @@
+syntax = "proto3";
+
+package burnout;
+
+// Burnout Prediction Service
+service BurnoutPredictorService {
+  // Predict burnout risk for a single employee
+  rpc PredictBurnoutRisk(BurnoutRiskRequest) returns (BurnoutRiskResponse);
+
+  // Batch predict burnout risk for multiple employees
+  rpc BatchPredictBurnoutRisk(BatchBurnoutRiskRequest) returns (BatchBurnoutRiskResponse);
+
+  // Get model metadata and performance metrics
+  rpc GetModelInfo(ModelInfoRequest) returns (ModelInfoResponse);
+
+  // Retrain the model with new data
+  rpc RetrainModel(RetrainRequest) returns (RetrainResponse);
+}
+
+// Request message for single employee burnout prediction
+message BurnoutRiskRequest {
+  string employee_id = 1;
+  EmployeeMetrics metrics = 2;
+}
+
+// Employee metrics for burnout prediction
+message EmployeeMetrics {
+  // Work-related metrics
+  double hours_worked_per_week = 1;
+  double overtime_hours = 2;
+  int32 days_since_last_vacation = 3;
+  int32 consecutive_work_days = 4;
+  double average_daily_meetings = 5;
+  double task_completion_rate = 6;
+  int32 open_tasks_count = 7;
+  int32 overdue_tasks_count = 8;
+
+  // Wellbeing metrics
+  double stress_level = 9;  // 0-10 scale
+  double sleep_hours_average = 10;
+  double exercise_frequency = 11;  // times per week
+  double work_life_balance_score = 12;  // 0-10 scale
+
+  // Engagement metrics
+  double productivity_score = 13;  // 0-100 scale
+  double team_collaboration_score = 14;  // 0-100 scale
+  int32 days_since_last_feedback = 15;
+  double job_satisfaction_score = 16;  // 0-10 scale
+
+  // Historical patterns
+  int32 sick_days_last_month = 17;
+  int32 late_logins_count = 18;
+  double average_response_time_hours = 19;
+  bool recent_performance_decline = 20;
+}
+
+// Response message for burnout prediction
+message BurnoutRiskResponse {
+  string employee_id = 1;
+  double risk_score = 2;  // 0-1 scale
+  RiskLevel risk_level = 3;
+  repeated RiskFactor top_risk_factors = 4;
+  string recommendation = 5;
+  int64 prediction_timestamp = 6;
+  string model_version = 7;
+}
+
+// Risk level enumeration
+enum RiskLevel {
+  RISK_LEVEL_UNKNOWN = 0;
+  LOW = 1;
+  MEDIUM = 2;
+  HIGH = 3;
+  CRITICAL = 4;
+}
+
+// Risk factor contribution
+message RiskFactor {
+  string factor_name = 1;
+  double contribution_score = 2;  // Impact on overall risk
+  string description = 3;
+}
+
+// Batch prediction request
+message BatchBurnoutRiskRequest {
+  repeated BurnoutRiskRequest requests = 1;
+}
+
+// Batch prediction response
+message BatchBurnoutRiskResponse {
+  repeated BurnoutRiskResponse predictions = 1;
+  int32 total_processed = 2;
+  int32 high_risk_count = 3;
+}
+
+// Model information request
+message ModelInfoRequest {
+  // Empty - no parameters needed
+}
+
+// Model information response
+message ModelInfoResponse {
+  string model_version = 1;
+  string model_type = 2;
+  double accuracy = 3;
+  double precision = 4;
+  double recall = 5;
+  double f1_score = 6;
+  int64 last_trained_timestamp = 7;
+  int32 training_samples_count = 8;
+  repeated string feature_names = 9;
+}
+
+// Model retraining request
+message RetrainRequest {
+  repeated TrainingSample training_data = 1;
+  bool validate_before_deployment = 2;
+}
+
+// Training sample
+message TrainingSample {
+  string employee_id = 1;
+  EmployeeMetrics metrics = 2;
+  bool actual_burnout_occurred = 3;
+}
+
+// Model retraining response
+message RetrainResponse {
+  bool success = 1;
+  string new_model_version = 2;
+  ModelPerformance performance = 3;
+  string message = 4;
+}
+
+// Model performance metrics
+message ModelPerformance {
+  double accuracy = 1;
+  double precision = 2;
+  double recall = 3;
+  double f1_score = 4;
+  double roc_auc = 5;
+}

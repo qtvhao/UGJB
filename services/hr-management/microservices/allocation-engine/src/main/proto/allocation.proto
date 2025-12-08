@@ -1,0 +1,153 @@
+syntax = "proto3";
+
+package com.ugjb.hr.allocation;
+
+option java_multiple_files = true;
+option java_package = "com.ugjb.hr.allocation.grpc";
+option java_outer_classname = "AllocationProto";
+
+// Allocation Engine gRPC Service
+service AllocationService {
+  // Create a new workforce assignment
+  rpc CreateAssignment(CreateAssignmentRequest) returns (AssignmentResponse);
+
+  // Get assignment by ID
+  rpc GetAssignment(GetAssignmentRequest) returns (AssignmentResponse);
+
+  // Update an existing assignment
+  rpc UpdateAssignment(UpdateAssignmentRequest) returns (AssignmentResponse);
+
+  // List assignments with filtering
+  rpc ListAssignments(ListAssignmentsRequest) returns (ListAssignmentsResponse);
+
+  // Get employee's FTE utilization
+  rpc GetEmployeeUtilization(GetEmployeeUtilizationRequest) returns (EmployeeUtilizationResponse);
+
+  // Validate allocation before creation
+  rpc ValidateAllocation(ValidateAllocationRequest) returns (ValidationResponse);
+
+  // Get optimal allocation plan using graph algorithms
+  rpc GetOptimalAllocationPlan(OptimalAllocationRequest) returns (OptimalAllocationResponse);
+}
+
+message CreateAssignmentRequest {
+  string employee_id = 1;
+  string project_id = 2;
+  AssignmentRole role = 3;
+  int32 allocation_percent = 4;
+  string start_date = 5;
+  string end_date = 6;
+}
+
+message GetAssignmentRequest {
+  string assignment_id = 1;
+}
+
+message UpdateAssignmentRequest {
+  string assignment_id = 1;
+  optional AssignmentRole role = 2;
+  optional int32 allocation_percent = 3;
+  optional string end_date = 4;
+  optional AssignmentStatus status = 5;
+}
+
+message ListAssignmentsRequest {
+  optional string employee_id = 1;
+  optional string project_id = 2;
+  optional AssignmentStatus status = 3;
+  int32 page = 4;
+  int32 size = 5;
+}
+
+message ListAssignmentsResponse {
+  repeated AssignmentResponse assignments = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 size = 4;
+}
+
+message AssignmentResponse {
+  string assignment_id = 1;
+  string employee_id = 2;
+  string project_id = 3;
+  AssignmentRole role = 4;
+  int32 allocation_percent = 5;
+  string start_date = 6;
+  string end_date = 7;
+  AssignmentStatus status = 8;
+  string created_at = 9;
+  string updated_at = 10;
+}
+
+message GetEmployeeUtilizationRequest {
+  string employee_id = 1;
+}
+
+message EmployeeUtilizationResponse {
+  string employee_id = 1;
+  int32 total_allocation_percent = 2;
+  int32 available_percent = 3;
+  repeated AssignmentSummary active_assignments = 4;
+}
+
+message AssignmentSummary {
+  string project_id = 1;
+  string project_name = 2;
+  int32 allocation_percent = 3;
+  AssignmentRole role = 4;
+}
+
+message ValidateAllocationRequest {
+  string employee_id = 1;
+  int32 requested_allocation_percent = 2;
+  optional string exclude_assignment_id = 3;
+}
+
+message ValidationResponse {
+  bool is_valid = 1;
+  string message = 2;
+  int32 current_allocation = 3;
+  int32 requested_allocation = 4;
+  int32 total_if_approved = 5;
+}
+
+message OptimalAllocationRequest {
+  repeated string project_ids = 1;
+  repeated SkillRequirement skill_requirements = 2;
+  int32 max_allocation_per_employee = 3;
+}
+
+message SkillRequirement {
+  string skill_name = 1;
+  int32 min_proficiency = 2;
+  int32 required_fte_percent = 3;
+}
+
+message OptimalAllocationResponse {
+  repeated ProposedAssignment proposed_assignments = 1;
+  int32 total_coverage_percent = 2;
+  repeated string unmet_requirements = 3;
+}
+
+message ProposedAssignment {
+  string employee_id = 1;
+  string employee_name = 2;
+  string project_id = 3;
+  int32 proposed_allocation_percent = 4;
+  repeated string matched_skills = 5;
+  double match_score = 6;
+}
+
+enum AssignmentRole {
+  ROLE_UNSPECIFIED = 0;
+  LEAD = 1;
+  CONTRIBUTOR = 2;
+  ADVISOR = 3;
+}
+
+enum AssignmentStatus {
+  STATUS_UNSPECIFIED = 0;
+  ACTIVE = 1;
+  INACTIVE = 2;
+  PENDING = 3;
+}
