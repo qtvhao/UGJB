@@ -3,55 +3,20 @@
 [![GitHub](https://img.shields.io/badge/github-repo-blue?logo=github)](https://github.com/qtvhao/UGJB)
 [![License](https://img.shields.io/github/license/qtvhao/UGJB.svg?color=blue)](LICENSE)
 
-> Plateforme open source unifiant la gestion RH et l'analyse d'ingénierie
+**Plateforme Unifiée de Gestion des Effectifs et d'Analyse de l'Ingénierie** - Une plateforme modulaire intégrant la gestion RH et l'analyse des performances d'ingénierie dans un système open-source unique.
 
-## Le Problème
+## Aperçu
 
-Les entreprises technologiques font face à un défi critique : **le fossé entre les systèmes RH et les outils d'ingénierie**.
-
-- Les plateformes RH (BambooHR, Lattice) manquent de métriques d'ingénierie (GitLab, métriques DORA)
-- Les outils d'ingénierie (Swarmia, LinearB) n'incluent pas les fonctionnalités RH (suivi des compétences, allocation FTE)
-- Les solutions SaaS d'entreprise sont coûteuses (plus de 200k$ sur 3 ans)
-- Les intégrations personnalisées coûtent 25k$-50k$ par système
-
-**Le résultat ?** Les décisions sur les talents sont déconnectées des résultats techniques. Les managers en ingénierie ne peuvent pas voir la capacité de l'équipe, et les équipes RH ne peuvent pas mesurer l'impact des compétences sur la performance.
-
-## La Solution UGJB
-
-UGJB (Plateforme Unifiée de Gestion de la Main-d'œuvre et d'Analyse d'Ingénierie) intègre la gestion RH avec une analyse approfondie de l'ingénierie dans un système open source unique.
+La plateforme UGJB permet aux organisations d'aligner les décisions en matière de talents avec les résultats techniques grâce à des insights en temps réel. Elle élimine les solutions SaaS fragmentées en combinant des capacités de niveau entreprise avec des modèles d'intégration standardisés et des composants réutilisables, tout en réduisant le coût total de possession.
 
 ### Fonctionnalités Principales
 
-**Gestion des Employés**
-- Profils complets des employés avec compétences, allocation FTE et statut professionnel
-- Inventaire des compétences avec niveaux de maîtrise et suivi des sources
-- Contrôle d'accès basé sur les rôles (RH, responsable ingénierie, contributeur individuel)
-
-**Analyse d'Ingénierie**
-- Métriques DORA (fréquence de déploiement, taux d'échec des changements, MTTR)
-- Intégration GitLab/GitHub (commits, PR, revues de code)
-- Intégration Jira (suivi des problèmes, métriques de sprint)
-- Firebase Crashlytics (attribution des incidents)
-- Prometheus (temps de disponibilité système, volume d'alertes)
-
-**Planification de la Main-d'œuvre**
-- Allocation entre projets avec validation FTE
-- Visualisation de la capacité d'équipe en temps réel
-- Analyse de corrélation compétences-résultats d'ingénierie
-
-**Tableaux de Bord Personnalisés**
-- Tableaux de bord KPI configurables pour différents publics
-- Intégration avec DevLake, Monday.com, Lattice
-- Actualisation en temps réel et tendances historiques
-
-![Gestion des Employés](./screenshots/employees-page.png)
-*Annuaire des employés avec suivi des rôles, départements et statuts*
-
-![Métriques d'Ingénierie](./screenshots/engineering-metrics-page.png)
-*Métriques DORA et analyse de performance d'ingénierie*
-
-![Tableaux de Bord Personnalisés](./screenshots/custom-dashboards-page.png)
-*Créer des tableaux de bord KPI configurables pour les cadres et les équipes*
+- **Gestion Unifiée des Effectifs** - Profils des employés, suivi des compétences, allocation FTE et statut de travail
+- **Analyse de l'Ingénierie** - Métriques DORA, scores de qualité du code et indicateurs de fiabilité
+- **Intégration avec les Outils de Développement** - Jira, GitLab, Firebase Crashlytics, Prometheus
+- **Tableaux de Bord en Temps Réel** - Visualisations KPI et rapports personnalisables
+- **Contrôle d'Accès Basé sur les Rôles** - Permissions granulaires et sécurité des données
+- **Open-Source et Modulaire** - Architecture extensible sans dépendance aux fournisseurs
 
 ## Démarrage Rapide
 
@@ -70,102 +35,85 @@ cd UGJB
 # Démarrer tous les services
 docker-compose up -d
 
-# Vérifier les contrôles de santé
-curl http://localhost:8080/health  # API Gateway
-curl http://localhost:8081         # Web UI (via nginx)
+# Vérifier l'endpoint de santé
+curl http://localhost:8080/health
 ```
 
 ### Accès à la Plateforme
 
-- **Web UI**: http://localhost:8081
-- **API Gateway**: http://localhost:8080
-- **Documentation API**: http://localhost:8080/docs
+- **Web UI** : http://localhost:8081
+- **API Gateway** : http://localhost:8080
 
-### Utilisation de Base
+## Architecture
 
-1. **Créer un profil d'employé**
-   ```bash
-   curl -X POST http://localhost:8080/api/v1/employees \
-     -H "Content-Type: application/json" \
-     -d '{
-       "name": "Jean Dupont",
-       "role": "Développeur Senior",
-       "department": "Ingénierie",
-       "status": "active",
-       "fte": 100
-     }'
-   ```
+UGJB suit une architecture basée sur les microservices avec des contextes délimités clairement définis :
 
-2. **Configurer l'intégration GitLab**
-   - Naviguer vers Paramètres > Intégrations
-   - Sélectionner GitLab
-   - Saisir le point de terminaison API et le jeton
-   - Définir la fréquence de synchronisation (minimum quotidien)
-
-3. **Afficher les métriques d'ingénierie**
-   - Visiter la page Métriques d'Ingénierie
-   - Voir les métriques DORA (fréquence de déploiement, délai de livraison, taux d'échec)
-   - Surveiller l'activité du code et les résultats de l'équipe
+- **Gestion RH** - Registre des employés et moteur d'allocation
+- **Analyse de l'Ingénierie** - Collecteur de métriques, moteur KPI, tableau de bord d'insights
+- **Gestion des Objectifs** - Suivi des objectifs et résultats clés
+- **Gestion de Projets** - Coordination des sprints et attribution des tâches
+- **Intégration Système** - Pipeline de données et passerelle API
+- **Bien-être des Effectifs** - Prédiction de l'épuisement professionnel et surveillance du bien-être
 
 ## Pourquoi UGJB ?
 
-### Insights Unifiés
-Corrélation des données de main-d'œuvre avec la performance d'ingénierie. Répondez à des questions comme : "L'expertise Kubernetes réduit-elle le temps de résolution des incidents ?"
+### Problèmes Résolus
 
-### Optimisation des Coûts
-- **Pas de frais de licence par utilisateur** : Architecture modulaire open source
-- **Objectif TCO sur 3 ans** : ≤120k$ (vs 200k$+ pour les solutions SaaS)
-- **Intégrations standardisées** : Réduction de 50% du temps de développement personnalisé
+1. **Fragmentation de l'Intégration** - Unifie les données de Firebase, Prometheus, GitLab et Jira
+2. **Silos de Domaine** - Connecte la gestion des compétences RH aux KPI d'ingénierie
+3. **Barrières de Coût** - ≤ 120k$ TCO sur 3 ans vs 200k$+ SaaS d'entreprise
+4. **Limitations de Personnalisation** - Workflows extensibles maintenant la stabilité de la plateforme
 
-### Fiabilité de Niveau Entreprise
-- SLA de disponibilité de 99,9%
-- Observabilité complète (Prometheus, ELK)
-- Synchronisation en temps réel entre domaines
+### Métriques de Succès
 
-### Personnalisation
-- Architecture microservices modulaire
-- Modèles d'intégration extensibles
-- Règles d'automatisation sans code
+| Métrique | Ligne de Base | Objectif |
+|----------|--------------|----------|
+| TCO sur 3 ans | 201k$-246k$ | ≤ 120k$ |
+| Couverture d'Intégration | 50% GitLab | 100% couverture |
+| Temps jusqu'aux Insights | 72+ heures | ≤ 2 heures |
+| Disponibilité de la Plateforme | Non défini | ≥ 99.9% |
 
-## Architecture Technique
+## Utilisation de Base
 
-UGJB utilise une architecture microservices avec 6 contextes délimités :
+### Gérer les Employés
 
-- **Gestion RH** (Java/Spring Boot) : Registre des employés, moteur d'allocation
-- **Analyse d'Ingénierie** (Python/FastAPI) : Collecteur de métriques, moteur KPI, tableau de bord
-- **Gestion des Objectifs** (TypeScript/NestJS) : OKR, suivi des résultats clés
-- **Gestion de Projet** (TypeScript/NestJS) : Coordination de sprint, répartition des tâches
-- **Intégration Système** (Kotlin/Go) : Pipeline de données, API Gateway
-- **Bien-être de la Main-d'œuvre** (Python/FastAPI) : Prédiction de l'épuisement, surveillance du bien-être
+```bash
+# Créer un profil d'employé via l'API
+curl -X POST http://localhost:8080/api/v1/employees \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Jean Dupont",
+    "role": "Développeur Senior",
+    "department": "Ingénierie",
+    "status": "active",
+    "fte": 100
+  }'
+```
 
-**Stockage de Données** : PostgreSQL, InfluxDB, TimescaleDB, ClickHouse, Redis
-**Messagerie** : Kafka, RabbitMQ
-**Observabilité** : Prometheus, Grafana, ELK
+### Voir les Métriques d'Ingénierie
 
-## Intégrations
+Accéder au tableau de bord des métriques d'ingénierie :
+- Métriques DORA (fréquence de déploiement, délai d'exécution)
+- Scores de qualité du code
+- Déploiements récents
+- Production d'ingénierie de l'équipe
 
-UGJB fournit des intégrations prêtes à l'emploi avec des outils courants :
+### Configurer les Intégrations
 
-| Outil | Objectif | Données | Protocole |
-|-------|----------|---------|-----------|
-| GitLab | Contrôle de version | Commits, PR, revues | REST + Webhooks |
-| Jira | Suivi des problèmes | Problèmes, tâches | REST + Webhooks |
-| Firebase Crashlytics | Surveillance des incidents | Crashes, erreurs | Notifications push |
-| Prometheus | Métriques système | Alertes, disponibilité | API de requête |
-| DevLake | Agrégation d'ingénierie | Métriques DORA | REST |
-| Monday.com | Gestion de projet | Tâches, flux de travail | GraphQL |
-| Lattice | Gestion de la performance | OKR, évaluations | REST |
+Connecter des outils externes via l'interface Web :
+1. Naviguer vers « Intégrations »
+2. Sélectionner le type d'outil (Jira, GitLab, Firebase, Prometheus)
+3. Saisir l'endpoint API et l'authentification
+4. Définir la fréquence de synchronisation
 
 ## Licence
 
-Licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de détails.
+Ce projet est sous licence open-source - consultez le fichier [LICENSE](LICENSE) pour plus de détails.
+
+## Contributions
+
+Les contributions sont les bienvenues ! N'hésitez pas à soumettre des Pull Requests.
 
 ## Support
 
-- **Documentation** : Consultez le répertoire comprehensive guides pour des guides détaillés d'architecture et d'implémentation
-- **Problèmes** : Soumettez les problèmes sur [GitHub Issues](https://github.com/qtvhao/UGJB/issues)
-- **Contributions** : Les Pull Requests sont les bienvenues ! Veuillez d'abord lire notre guide de contribution
-
----
-
-**Commencez à combler le fossé entre RH et ingénierie dès aujourd'hui.** 🚀
+Pour des questions ou du support, ouvrez une issue sur [GitHub Issues](https://github.com/qtvhao/UGJB/issues).

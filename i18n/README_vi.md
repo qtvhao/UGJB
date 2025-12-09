@@ -3,86 +3,117 @@
 [![GitHub](https://img.shields.io/badge/github-repo-blue?logo=github)](https://github.com/qtvhao/UGJB)
 [![License](https://img.shields.io/github/license/qtvhao/UGJB.svg?color=blue)](LICENSE)
 
-> Nền tảng mã nguồn mở thống nhất quản lý nhân sự và phân tích kỹ thuật
+**Nền tảng Quản lý Nhân sự và Phân tích Kỹ thuật Thống nhất** - Một nền tảng mô-đun tích hợp quản lý nhân sự với phân tích hiệu suất kỹ thuật trong một hệ thống mã nguồn mở duy nhất.
 
-## Vấn Đề
+## Tổng quan
 
-Các công ty công nghệ đang đối mặt với thách thức nghiêm trọng: **khoảng cách giữa hệ thống HR và công cụ kỹ thuật**.
+Nền tảng UGJB cho phép các tổ chức điều chỉnh quyết định về nhân tài với kết quả kỹ thuật thông qua thông tin chi tiết theo thời gian thực. Nó loại bỏ các giải pháp SaaS phân mảnh bằng cách kết hợp khả năng cấp doanh nghiệp với các mẫu tích hợp được tiêu chuẩn hóa và các thành phần có thể tái sử dụng, đồng thời giảm tổng chi phí sở hữu.
 
-- Nền tảng HR (BambooHR, Lattice) thiếu số liệu kỹ thuật (GitLab, số liệu DORA)
-- Công cụ kỹ thuật (Swarmia, LinearB) không bao gồm chức năng HR (theo dõi kỹ năng, phân bổ FTE)
-- Giải pháp SaaS doanh nghiệp đắt đỏ (hơn $200k trong 3 năm)
-- Tích hợp tùy chỉnh tốn $25k-50k mỗi hệ thống
+### Tính năng Chính
 
-**Kết quả?** Quyết định nhân tài bị ngắt kết nối với kết quả kỹ thuật. Quản lý kỹ thuật không thể thấy năng lực đội ngũ, và đội HR không thể đo lường tác động của kỹ năng đến hiệu suất.
+- **Quản lý Nhân sự Thống nhất** - Hồ sơ nhân viên, theo dõi kỹ năng, phân bổ FTE và trạng thái làm việc
+- **Phân tích Kỹ thuật** - Chỉ số DORA, điểm chất lượng mã và chỉ báo độ tin cậy
+- **Tích hợp với Công cụ Phát triển** - Jira, GitLab, Firebase Crashlytics, Prometheus
+- **Bảng điều khiển Thời gian Thực** - Trực quan hóa KPI và báo cáo có thể tùy chỉnh
+- **Kiểm soát Truy cập Dựa trên Vai trò** - Quyền chi tiết và bảo mật dữ liệu
+- **Mã nguồn Mở và Mô-đun** - Kiến trúc có thể mở rộng, không phụ thuộc nhà cung cấp
 
-## Giải Pháp UGJB
+## Bắt đầu Nhanh
 
-UGJB (Nền tảng Thống nhất Lực lượng Lao động và Phân tích Kỹ thuật) tích hợp quản lý HR với phân tích kỹ thuật sâu trong một hệ thống mã nguồn mở duy nhất.
-
-### Tính Năng Chính
-
-**Quản Lý Nhân Viên**
-- Hồ sơ nhân viên đầy đủ với kỹ năng, phân bổ FTE và trạng thái làm việc
-- Kho kỹ năng với mức độ thành thạo và theo dõi nguồn
-- Kiểm soát truy cập dựa trên vai trò (HR, trưởng nhóm kỹ thuật, cá nhân đóng góp)
-
-**Phân Tích Kỹ Thuật**
-- Số liệu DORA (tần suất triển khai, tỷ lệ thất bại thay đổi, MTTR)
-- Tích hợp GitLab/GitHub (commit, PR, đánh giá mã)
-- Tích hợp Jira (theo dõi vấn đề, số liệu sprint)
-- Firebase Crashlytics (phân bổ sự cố)
-- Prometheus (thời gian hoạt động hệ thống, khối lượng cảnh báo)
-
-**Lập Kế Hoạch Lực Lượng Lao Động**
-- Phân bổ giữa các dự án với xác thực FTE
-- Trực quan hóa năng lực đội ngũ theo thời gian thực
-- Phân tích tương quan kỹ năng-kết quả kỹ thuật
-
-**Bảng Điều Khiển Tùy Chỉnh**
-- Bảng điều khiển KPI có thể cấu hình cho các đối tượng khác nhau
-- Tích hợp với DevLake, Monday.com, Lattice
-- Làm mới theo thời gian thực và xu hướng lịch sử
-
-![Quản Lý Nhân Viên](./screenshots/employees-page.png)
-
-![Số Liệu Kỹ Thuật](./screenshots/engineering-metrics-page.png)
-
-![Bảng Điều Khiển Tùy Chỉnh](./screenshots/custom-dashboards-page.png)
-
-## Bắt Đầu Nhanh
-
-### Yêu Cầu
+### Yêu cầu
 
 - Docker và Docker Compose
 - Git
 
-### Cài Đặt
+### Cài đặt
 
 ```bash
+# Sao chép kho lưu trữ
 git clone https://github.com/qtvhao/UGJB.git
 cd UGJB
+
+# Khởi động tất cả dịch vụ
 docker-compose up -d
+
+# Xác minh endpoint sức khỏe
 curl http://localhost:8080/health
 ```
 
-### Truy Cập Nền Tảng
+### Truy cập Nền tảng
 
 - **Web UI**: http://localhost:8081
 - **API Gateway**: http://localhost:8080
-- **Tài Liệu API**: http://localhost:8080/docs
 
-## Tại Sao Chọn UGJB?
+## Kiến trúc
 
-- **Không phí giấy phép người dùng**: Kiến trúc mô-đun mã nguồn mở
-- **TCO 3 năm**: ≤$120k (so với $200k+ giải pháp SaaS)
-- **Tích hợp tiêu chuẩn hóa**: Giảm 50% thời gian phát triển tùy chỉnh
-- **Độ tin cậy doanh nghiệp**: SLA thời gian hoạt động 99,9%
+UGJB tuân theo kiến trúc dựa trên microservices với các bối cảnh giới hạn được định nghĩa rõ ràng:
 
-## Giấy Phép
+- **Quản lý Nhân sự** - Đăng ký nhân viên và công cụ phân bổ
+- **Phân tích Kỹ thuật** - Bộ thu thập chỉ số, công cụ KPI, bảng điều khiển thông tin chi tiết
+- **Quản lý Mục tiêu** - Theo dõi mục tiêu và kết quả chính
+- **Quản lý Dự án** - Điều phối sprint và gán nhiệm vụ
+- **Tích hợp Hệ thống** - Đường ống dữ liệu và cổng API
+- **Phúc lợi Nhân sự** - Dự đoán kiệt sức và giám sát phúc lợi
 
-Giấy phép MIT - xem tệp [LICENSE](LICENSE) để biết chi tiết.
+## Tại sao UGJB?
 
----
+### Vấn đề được Giải quyết
 
-**Bắt đầu thu hẹp khoảng cách giữa HR và kỹ thuật hôm nay.** 🚀
+1. **Phân mảnh Tích hợp** - Thống nhất dữ liệu từ Firebase, Prometheus, GitLab và Jira
+2. **Phân lập Miền** - Kết nối quản lý kỹ năng nhân sự với KPI kỹ thuật
+3. **Rào cản Chi phí** - ≤ $120k TCO 3 năm so với $200k+ SaaS doanh nghiệp
+4. **Hạn chế Tùy chỉnh** - Quy trình làm việc có thể mở rộng duy trì ổn định nền tảng
+
+### Chỉ số Thành công
+
+| Chỉ số | Cơ sở | Mục tiêu |
+|--------|-------|----------|
+| TCO 3 năm | $201k-$246k | ≤ $120k |
+| Phạm vi Tích hợp | 50% GitLab | 100% phạm vi |
+| Thời gian đến Thông tin | 72+ giờ | ≤ 2 giờ |
+| Thời gian Hoạt động Nền tảng | Chưa xác định | ≥ 99.9% |
+
+## Sử dụng Cơ bản
+
+### Quản lý Nhân viên
+
+```bash
+# Tạo hồ sơ nhân viên qua API
+curl -X POST http://localhost:8080/api/v1/employees \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Nguyễn Văn A",
+    "role": "Lập trình viên Cấp cao",
+    "department": "Kỹ thuật",
+    "status": "active",
+    "fte": 100
+  }'
+```
+
+### Xem Chỉ số Kỹ thuật
+
+Truy cập bảng điều khiển chỉ số kỹ thuật:
+- Chỉ số DORA (tần suất triển khai, thời gian dẫn đầu)
+- Điểm chất lượng mã
+- Triển khai gần đây
+- Đầu ra kỹ thuật của nhóm
+
+### Cấu hình Tích hợp
+
+Kết nối công cụ bên ngoài qua Web UI:
+1. Điều hướng đến "Tích hợp"
+2. Chọn loại công cụ (Jira, GitLab, Firebase, Prometheus)
+3. Nhập endpoint API và xác thực
+4. Đặt tần suất đồng bộ
+
+## Giấy phép
+
+Dự án này tuân theo giấy phép mã nguồn mở - xem tệp [LICENSE](LICENSE) để biết chi tiết.
+
+## Đóng góp
+
+Chúng tôi hoan nghênh đóng góp! Hãy thoải mái gửi Pull Request.
+
+## Hỗ trợ
+
+Để được hỗ trợ hoặc có câu hỏi, hãy mở một vấn đề trên [GitHub Issues](https://github.com/qtvhao/UGJB/issues).
