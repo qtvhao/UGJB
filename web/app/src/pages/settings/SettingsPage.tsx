@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { Shield, Users, Key, Database, Lock } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -66,14 +67,6 @@ export default function SettingsPage() {
     setSecurityStates(prev => ({ ...prev, [settingName]: !prev[settingName] }))
   }
 
-  const handleCreateRole = () => {
-    // Role creation will be handled by modal/form - implementation pending
-  }
-
-  const handleLoadMore = () => {
-    // Load more audit logs from API - implementation pending
-  }
-
   return (
     <div className="space-y-6">
       <div>
@@ -130,10 +123,12 @@ export default function SettingsPage() {
       {activeTab === 'roles' && (
         <div className="space-y-4">
           <div className="flex justify-end">
-            <Button onClick={handleCreateRole}>
-              <Key className="w-4 h-4 mr-2" />
-              Create Role
-            </Button>
+            <Link to="/settings/roles/new">
+              <Button>
+                <Key className="w-4 h-4 mr-2" />
+                Create Role
+              </Button>
+            </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {roles.map((role) => (
@@ -258,7 +253,9 @@ export default function SettingsPage() {
               </table>
             </div>
             <div className="mt-4 flex justify-center">
-              <Button variant="outline" onClick={handleLoadMore}>Load More</Button>
+              <Link to="/settings/audit-log">
+                <Button variant="outline">Load More</Button>
+              </Link>
             </div>
           </CardContent>
         </Card>

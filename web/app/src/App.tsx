@@ -7,12 +7,19 @@ import Dashboard from '@/pages/Dashboard'
 import EmployeesPage from '@/pages/hr/EmployeesPage'
 import EmployeeProfilePage from '@/pages/hr/EmployeeProfilePage'
 import SkillsInventoryPage from '@/pages/hr/SkillsInventoryPage'
+import NewSkillPage from '@/pages/hr/NewSkillPage'
+import PendingSkillsPage from '@/pages/hr/PendingSkillsPage'
 import WorkforceAssignmentsPage from '@/pages/hr/WorkforceAssignmentsPage'
+import NewAssignmentPage from '@/pages/hr/NewAssignmentPage'
+import OverallocationPage from '@/pages/hr/OverallocationPage'
 import WorkforcePlanningPage from '@/pages/hr/WorkforcePlanningPage'
 import SkillDevelopmentPage from '@/pages/hr/SkillDevelopmentPage'
+import LearningPathsPage from '@/pages/hr/LearningPathsPage'
 import EngineeringMetricsPage from '@/pages/analytics/EngineeringMetricsPage'
 import IntegrationsPage from '@/pages/integrations/IntegrationsPage'
 import SettingsPage from '@/pages/settings/SettingsPage'
+import NewRolePage from '@/pages/settings/NewRolePage'
+import AuditLogPage from '@/pages/settings/AuditLogPage'
 import NotFoundPage from '@/pages/NotFoundPage'
 
 // Cluster 0002 Pages
@@ -39,11 +46,16 @@ function App() {
           <Route path="employees" element={<EmployeesPage />} />
           <Route path="employees/:id" element={<EmployeeProfilePage />} />
           <Route path="skills" element={<SkillsInventoryPage />} />
+          <Route path="skills/new" element={<NewSkillPage />} />
+          <Route path="skills/pending" element={<PendingSkillsPage />} />
           <Route path="assignments" element={<WorkforceAssignmentsPage />} />
+          <Route path="assignments/new" element={<NewAssignmentPage />} />
+          <Route path="assignments/overallocation" element={<OverallocationPage />} />
 
           {/* Workforce Planning - US07, US08 */}
           <Route path="workforce-planning" element={<WorkforcePlanningPage />} />
           <Route path="skill-development" element={<SkillDevelopmentPage />} />
+          <Route path="skill-development/learning-paths" element={<LearningPathsPage />} />
           <Route path="team-capacity" element={<TeamCapacityPage />} />
 
           {/* Engineering Analytics - US04 */}
@@ -69,6 +81,8 @@ function App() {
 
           {/* Settings - US06 (RBAC) */}
           <Route path="settings" element={<SettingsPage />} />
+          <Route path="settings/roles/new" element={<NewRolePage />} />
+          <Route path="settings/audit-log" element={<AuditLogPage />} />
 
           {/* 404 */}
           <Route path="*" element={<NotFoundPage />} />

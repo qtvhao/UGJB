@@ -28,44 +28,6 @@ interface AutomationRule {
   executionCount: number
 }
 
-const mockRules: AutomationRule[] = [
-  {
-    id: '1',
-    name: 'Low Deployment Frequency Alert',
-    conditionType: 'trigger',
-    metric: 'deployment_frequency',
-    operator: '<',
-    value: 5,
-    action: 'skill_gap_analysis',
-    status: 'active',
-    lastTriggered: '2 hours ago',
-    executionCount: 12,
-  },
-  {
-    id: '2',
-    name: 'High Incident Frequency',
-    conditionType: 'trigger',
-    metric: 'incident_frequency',
-    operator: '>',
-    value: 5,
-    action: 'root_cause_analysis',
-    status: 'active',
-    lastTriggered: '1 day ago',
-    executionCount: 5,
-  },
-  {
-    id: '3',
-    name: 'Blocked Tickets Threshold',
-    conditionType: 'trigger',
-    metric: 'blocked_tickets',
-    operator: '>',
-    value: 3,
-    action: 'resource_reallocation',
-    status: 'inactive',
-    executionCount: 0,
-  },
-]
-
 export default function AutomationRulesPage() {
   const navigate = useNavigate()
   const [rules, setRules] = useState<AutomationRule[]>([])
@@ -80,13 +42,9 @@ export default function AutomationRulesPage() {
         if (response.data && Array.isArray(response.data)) {
           setRules(response.data)
           setTriggeredToday(response.data.filter((r: AutomationRule) => r.lastTriggered?.includes('hour') || r.lastTriggered?.includes('min')).length)
-        } else {
-          setRules(mockRules)
-          setTriggeredToday(mockRules.filter(r => r.lastTriggered?.includes('hour') || r.lastTriggered?.includes('min')).length)
         }
       } catch {
-        setRules(mockRules)
-        setTriggeredToday(mockRules.filter(r => r.lastTriggered?.includes('hour') || r.lastTriggered?.includes('min')).length)
+        // Keep empty state on error
       } finally {
         setLoading(false)
       }
@@ -207,7 +165,7 @@ export default function AutomationRulesPage() {
             <div className="flex justify-center py-8">
               <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
             </div>
-          ) : (
+          ) : rules.length > 0 ? (
             <div className="divide-y divide-secondary-200 dark:divide-secondary-700">
               {rules.map((rule) => (
                 <div
@@ -243,6 +201,15 @@ export default function AutomationRulesPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <Zap className="w-12 h-12 text-secondary-300 mx-auto mb-4" />
+              <p className="text-secondary-500">No automation rules configured yet</p>
+              <Button onClick={handleCreateRule} className="mt-4">
+                <Plus className="w-4 h-4 mr-2" />
+                Create Your First Rule
+              </Button>
             </div>
           )}
         </CardContent>

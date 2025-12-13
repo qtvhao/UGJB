@@ -151,7 +151,7 @@ export default function PlatformSyncPage() {
   const [logs] = useState<SyncLog[]>(mockLogs)
   const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null)
 
-  const [syncing, setSyncing] = useState<string[]>([])
+  const [, setSyncing] = useState<string[]>([])
   const [historyId, setHistoryId] = useState<string | null>(null)
 
   const handleSyncAll = () => {

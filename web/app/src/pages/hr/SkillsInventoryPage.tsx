@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { Plus, Search, CheckCircle, Clock, XCircle } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -21,14 +22,6 @@ export default function SkillsInventoryPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
 
-  const handleAddSkill = () => {
-    // Open add skill modal - implementation pending
-  }
-
-  const handleReviewPending = () => {
-    // Navigate to pending skills review - implementation pending
-  }
-
   const filteredSkills = mockSkills.filter((skill) => {
     const matchesSearch = skill.name.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesCategory = selectedCategory === 'All' || skill.category === selectedCategory
@@ -46,10 +39,12 @@ export default function SkillsInventoryPage() {
             Manage organizational skills taxonomy
           </p>
         </div>
-        <Button onClick={handleAddSkill}>
-          <Plus className="w-4 h-4 mr-2" />
-          Add Skill
-        </Button>
+        <Link to="/skills/new">
+          <Button>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Skill
+          </Button>
+        </Link>
       </div>
 
       {/* Pending Approvals Alert */}
@@ -66,9 +61,11 @@ export default function SkillsInventoryPage() {
                   Review and approve new skills added by team members
                 </p>
               </div>
-              <Button size="sm" variant="outline" onClick={handleReviewPending}>
-                Review
-              </Button>
+              <Link to="/skills/pending">
+                <Button size="sm" variant="outline">
+                  Review
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>

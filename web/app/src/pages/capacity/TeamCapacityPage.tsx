@@ -31,20 +31,6 @@ interface EmployeeAllocation {
   status: 'optimal' | 'over' | 'under'
 }
 
-const mockTeams: TeamCapacity[] = [
-  { id: '1', name: 'Team Alpha', totalFte: 5, allocatedFte: 4.5, utilizationPct: 90, memberCount: 5, status: 'healthy' },
-  { id: '2', name: 'Team Beta', totalFte: 4, allocatedFte: 4.2, utilizationPct: 105, memberCount: 4, status: 'overloaded' },
-  { id: '3', name: 'Team Gamma', totalFte: 6, allocatedFte: 4.0, utilizationPct: 67, memberCount: 6, status: 'warning' },
-  { id: '4', name: 'Team Delta', totalFte: 3, allocatedFte: 2.7, utilizationPct: 90, memberCount: 3, status: 'healthy' },
-]
-
-const mockEmployees: EmployeeAllocation[] = [
-  { id: '1', name: 'Alex Chen', team: 'Team Alpha', allocation: 100, projects: ['Project X'], status: 'optimal' },
-  { id: '2', name: 'Sarah Johnson', team: 'Team Beta', allocation: 120, projects: ['Project Y', 'Project Z'], status: 'over' },
-  { id: '3', name: 'Mike Brown', team: 'Team Gamma', allocation: 60, projects: ['Project X'], status: 'under' },
-  { id: '4', name: 'Emily Davis', team: 'Team Alpha', allocation: 90, projects: ['Project Y'], status: 'optimal' },
-]
-
 export default function TeamCapacityPage() {
   const [teams, setTeams] = useState<TeamCapacity[]>([])
   const [employees, setEmployees] = useState<EmployeeAllocation[]>([])
@@ -55,20 +41,19 @@ export default function TeamCapacityPage() {
     async function fetchCapacity() {
       try {
         setLoading(true)
-        const [alertsOver, alertsUnder] = await Promise.allSettled([
-          capacityApi.alerts.overAllocated(),
-          capacityApi.alerts.underUtilized(),
+        const [teamsRes, employeesRes] = await Promise.allSettled([
+          capacityApi.teams.list(),
+          capacityApi.employees.list(),
         ])
-        if (alertsOver.status === 'fulfilled' || alertsUnder.status === 'fulfilled') {
-          setTeams(mockTeams)
-          setEmployees(mockEmployees)
-        } else {
-          setTeams(mockTeams)
-          setEmployees(mockEmployees)
+
+        if (teamsRes.status === 'fulfilled' && teamsRes.value.data) {
+          setTeams(teamsRes.value.data)
+        }
+        if (employeesRes.status === 'fulfilled' && employeesRes.value.data) {
+          setEmployees(employeesRes.value.data)
         }
       } catch {
-        setTeams(mockTeams)
-        setEmployees(mockEmployees)
+        // Keep empty state on error
       } finally {
         setLoading(false)
       }
@@ -120,6 +105,10 @@ export default function TeamCapacityPage() {
     )
   }
 
+  const avgUtilization = teams.length > 0
+    ? Math.round(teams.reduce((sum, t) => sum + t.utilizationPct, 0) / teams.length)
+    : 0
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -131,7 +120,7 @@ export default function TeamCapacityPage() {
             Visualize team capacity and allocation across projects
           </p>
         </div>
-        <Button onClick={handleExportReport} disabled={exporting}>
+        <Button onClick={handleExportReport} disabled={exporting || teams.length === 0}>
           <Download className={`w-4 h-4 mr-2 ${exporting ? 'animate-spin' : ''}`} />
           {exporting ? 'Exporting...' : 'Export Report'}
         </Button>
@@ -162,7 +151,7 @@ export default function TeamCapacityPage() {
               </div>
               <div>
                 <p className="text-xl font-semibold text-secondary-900 dark:text-white">
-                  85%
+                  {avgUtilization}%
                 </p>
                 <p className="text-xs text-secondary-500">Avg Utilization</p>
               </div>
@@ -211,7 +200,7 @@ export default function TeamCapacityPage() {
             <div className="flex justify-center py-8">
               <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
             </div>
-          ) : (
+          ) : teams.length > 0 ? (
             <div className="space-y-4">
               {teams.map((team) => (
                 <div key={team.id} className="p-4 border border-secondary-200 dark:border-secondary-700 rounded-lg">
@@ -242,6 +231,11 @@ export default function TeamCapacityPage() {
                 </div>
               ))}
             </div>
+          ) : (
+            <div className="text-center py-8">
+              <Users className="w-12 h-12 text-secondary-300 mx-auto mb-4" />
+              <p className="text-secondary-500">No team capacity data available</p>
+            </div>
           )}
         </CardContent>
       </Card>
@@ -252,33 +246,37 @@ export default function TeamCapacityPage() {
           <CardTitle>Individual Allocations</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="divide-y divide-secondary-200 dark:divide-secondary-700">
-            {employees.map((emp) => (
-              <div key={emp.id} className="py-3 flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-secondary-900 dark:text-white">{emp.name}</p>
-                  <p className="text-sm text-secondary-500">{emp.team}</p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <p className={`font-medium ${getStatusColor(emp.status)}`}>
-                      {emp.allocation}%
-                    </p>
-                    <p className="text-xs text-secondary-500">
-                      {emp.projects.join(', ')}
-                    </p>
+          {employees.length > 0 ? (
+            <div className="divide-y divide-secondary-200 dark:divide-secondary-700">
+              {employees.map((emp) => (
+                <div key={emp.id} className="py-3 flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-secondary-900 dark:text-white">{emp.name}</p>
+                    <p className="text-sm text-secondary-500">{emp.team}</p>
                   </div>
-                  {emp.status === 'optimal' ? (
-                    <CheckCircle className="w-5 h-5 text-green-500" />
-                  ) : emp.status === 'over' ? (
-                    <AlertTriangle className="w-5 h-5 text-red-500" />
-                  ) : (
-                    <MinusCircle className="w-5 h-5 text-yellow-500" />
-                  )}
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <p className={`font-medium ${getStatusColor(emp.status)}`}>
+                        {emp.allocation}%
+                      </p>
+                      <p className="text-xs text-secondary-500">
+                        {emp.projects.join(', ')}
+                      </p>
+                    </div>
+                    {emp.status === 'optimal' ? (
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                    ) : emp.status === 'over' ? (
+                      <AlertTriangle className="w-5 h-5 text-red-500" />
+                    ) : (
+                      <MinusCircle className="w-5 h-5 text-yellow-500" />
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-secondary-500 py-4">No employee allocation data available</p>
+          )}
         </CardContent>
       </Card>
     </div>

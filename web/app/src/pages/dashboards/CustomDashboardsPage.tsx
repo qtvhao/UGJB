@@ -26,36 +26,6 @@ interface Dashboard {
   lastUpdated: string
 }
 
-const mockDashboards: Dashboard[] = [
-  {
-    id: '1',
-    name: 'Engineering Performance Overview',
-    targetAudience: 'executive',
-    dataSources: ['DevLake', 'Jira', 'Monday.com'],
-    widgetCount: 6,
-    refreshInterval: 'hourly',
-    lastUpdated: '1 hour ago',
-  },
-  {
-    id: '2',
-    name: 'Team Velocity Dashboard',
-    targetAudience: 'team',
-    dataSources: ['Jira', 'DevLake'],
-    widgetCount: 4,
-    refreshInterval: 'daily',
-    lastUpdated: '3 hours ago',
-  },
-  {
-    id: '3',
-    name: 'DORA Metrics Summary',
-    targetAudience: 'executive',
-    dataSources: ['DevLake', 'Prometheus'],
-    widgetCount: 8,
-    refreshInterval: 'real-time',
-    lastUpdated: '5 mins ago',
-  },
-]
-
 export default function CustomDashboardsPage() {
   const navigate = useNavigate()
   const [dashboards, setDashboards] = useState<Dashboard[]>([])
@@ -68,11 +38,9 @@ export default function CustomDashboardsPage() {
         const response = await dashboardsApi.list()
         if (response.data && Array.isArray(response.data)) {
           setDashboards(response.data)
-        } else {
-          setDashboards(mockDashboards)
         }
       } catch {
-        setDashboards(mockDashboards)
+        // Keep empty state on error
       } finally {
         setLoading(false)
       }
@@ -98,7 +66,7 @@ export default function CustomDashboardsPage() {
         await dashboardsApi.delete(dashboardId)
         setDashboards(dashboards.filter(d => d.id !== dashboardId))
       } catch {
-        setDashboards(dashboards.filter(d => d.id !== dashboardId))
+        // Keep current state on error
       }
     }
   }
@@ -182,7 +150,7 @@ export default function CustomDashboardsPage() {
             <div className="flex justify-center py-8">
               <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
             </div>
-          ) : (
+          ) : dashboards.length > 0 ? (
             <div className="space-y-4">
               {dashboards.map((dashboard) => (
                 <div
@@ -225,6 +193,15 @@ export default function CustomDashboardsPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <LayoutGrid className="w-12 h-12 text-secondary-300 mx-auto mb-4" />
+              <p className="text-secondary-500">No dashboards created yet</p>
+              <Button onClick={handleCreateDashboard} className="mt-4">
+                <Plus className="w-4 h-4 mr-2" />
+                Create Your First Dashboard
+              </Button>
             </div>
           )}
         </CardContent>

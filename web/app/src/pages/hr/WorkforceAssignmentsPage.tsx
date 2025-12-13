@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { Plus, Search, AlertTriangle } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -22,14 +23,6 @@ const overAllocatedEmployees = [
 export default function WorkforceAssignmentsPage() {
   const [searchQuery, setSearchQuery] = useState('')
 
-  const handleNewAssignment = () => {
-    // Open new assignment modal - implementation pending
-  }
-
-  const handleResolveOverallocation = () => {
-    // Navigate to allocation resolution - implementation pending
-  }
-
   const filteredAssignments = mockAssignments.filter(
     (a) =>
       a.employee.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -47,10 +40,12 @@ export default function WorkforceAssignmentsPage() {
             Track employee allocations across projects
           </p>
         </div>
-        <Button onClick={handleNewAssignment}>
-          <Plus className="w-4 h-4 mr-2" />
-          New Assignment
-        </Button>
+        <Link to="/assignments/new">
+          <Button>
+            <Plus className="w-4 h-4 mr-2" />
+            New Assignment
+          </Button>
+        </Link>
       </div>
 
       {/* Over-allocation Warning */}
@@ -69,9 +64,11 @@ export default function WorkforceAssignmentsPage() {
                   </p>
                 ))}
               </div>
-              <Button size="sm" variant="danger" onClick={handleResolveOverallocation}>
-                Resolve
-              </Button>
+              <Link to="/assignments/overallocation">
+                <Button size="sm" variant="danger">
+                  Resolve
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>

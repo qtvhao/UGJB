@@ -1,33 +1,44 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router'
-import { Plus, Search, Filter, MoreHorizontal } from 'lucide-react'
+import { Plus, Search, Filter, MoreHorizontal, Loader2, Users } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { hrApi } from '@/lib/api'
 
-// Mock data based on US01 - Employee Profile Management
-const mockEmployees = [
-  { id: 'EMP001', name: 'John Smith', email: 'john.smith@company.com', department: 'Engineering', role: 'Senior Developer', status: 'Active' },
-  { id: 'EMP002', name: 'Jane Doe', email: 'jane.doe@company.com', department: 'Product', role: 'Product Manager', status: 'Active' },
-  { id: 'EMP003', name: 'Bob Johnson', email: 'bob.johnson@company.com', department: 'Engineering', role: 'Tech Lead', status: 'Active' },
-  { id: 'EMP004', name: 'Alice Williams', email: 'alice.williams@company.com', department: 'Design', role: 'UX Designer', status: 'On Leave' },
-  { id: 'EMP005', name: 'Charlie Brown', email: 'charlie.brown@company.com', department: 'Engineering', role: 'Junior Developer', status: 'Active' },
-]
+interface Employee {
+  id: string
+  name: string
+  email: string
+  department: string
+  role: string
+  status: string
+}
 
 export default function EmployeesPage() {
   const [searchQuery, setSearchQuery] = useState('')
-  const [employees] = useState(mockEmployees)
+  const [employees, setEmployees] = useState<Employee[]>([])
+  const [loading, setLoading] = useState(true)
+  const [showFilters, setShowFilters] = useState(false)
 
-  const handleAddEmployee = () => {
-    // Open add employee modal - implementation pending
-  }
-
-  const handleOpenFilters = () => {
-    // Open filters panel - implementation pending
-  }
+  useEffect(() => {
+    async function fetchEmployees() {
+      try {
+        setLoading(true)
+        const response = await hrApi.employees.list()
+        if (response.data && Array.isArray(response.data)) {
+          setEmployees(response.data)
+        }
+      } catch {
+        // Keep empty state on error
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchEmployees()
+  }, [])
 
   const handleEmployeeActions = (employeeId: string) => {
-    // Open actions dropdown for employee - implementation pending
     void employeeId
   }
 
@@ -47,10 +58,12 @@ export default function EmployeesPage() {
             Manage employee profiles and information
           </p>
         </div>
-        <Button onClick={handleAddEmployee}>
-          <Plus className="w-4 h-4 mr-2" />
-          Add Employee
-        </Button>
+        <Link to="/employees/new">
+          <Button>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Employee
+          </Button>
+        </Link>
       </div>
 
       {/* Filters */}
@@ -69,7 +82,7 @@ export default function EmployeesPage() {
                 />
               </div>
             </div>
-            <Button variant="outline" onClick={handleOpenFilters}>
+            <Button variant="outline" onClick={() => setShowFilters(!showFilters)}>
               <Filter className="w-4 h-4 mr-2" />
               Filters
             </Button>
@@ -79,74 +92,91 @@ export default function EmployeesPage() {
 
       {/* Employee List */}
       <Card>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-secondary-50 dark:bg-secondary-800/50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">
-                  Employee
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">
-                  Department
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">
-                  Role
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-secondary-200 dark:divide-secondary-700">
-              {filteredEmployees.map((employee) => (
-                <tr key={employee.id} className="hover:bg-secondary-50 dark:hover:bg-secondary-800/50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <Link to={`/employees/${employee.id}`} className="flex items-center">
-                      <div className="w-10 h-10 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center">
-                        <span className="text-primary-600 dark:text-primary-400 font-medium">
-                          {employee.name.split(' ').map(n => n[0]).join('')}
-                        </span>
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-secondary-900 dark:text-white">
-                          {employee.name}
-                        </div>
-                        <div className="text-sm text-secondary-500 dark:text-secondary-400">
-                          {employee.email}
-                        </div>
-                      </div>
-                    </Link>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-600 dark:text-secondary-400">
-                    {employee.department}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-600 dark:text-secondary-400">
-                    {employee.role}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                        employee.status === 'Active'
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                          : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
-                      }`}
-                    >
-                      {employee.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <Button variant="ghost" size="sm" onClick={() => handleEmployeeActions(employee.id)}>
-                      <MoreHorizontal className="w-4 h-4" />
-                    </Button>
-                  </td>
+        {loading ? (
+          <div className="flex justify-center py-8">
+            <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+          </div>
+        ) : employees.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-secondary-50 dark:bg-secondary-800/50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">
+                    Employee
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">
+                    Department
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">
+                    Role
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-secondary-500 dark:text-secondary-400 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-secondary-200 dark:divide-secondary-700">
+                {filteredEmployees.map((employee) => (
+                  <tr key={employee.id} className="hover:bg-secondary-50 dark:hover:bg-secondary-800/50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <Link to={`/employees/${employee.id}`} className="flex items-center">
+                        <div className="w-10 h-10 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center">
+                          <span className="text-primary-600 dark:text-primary-400 font-medium">
+                            {employee.name.split(' ').map(n => n[0]).join('')}
+                          </span>
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-secondary-900 dark:text-white">
+                            {employee.name}
+                          </div>
+                          <div className="text-sm text-secondary-500 dark:text-secondary-400">
+                            {employee.email}
+                          </div>
+                        </div>
+                      </Link>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-600 dark:text-secondary-400">
+                      {employee.department}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-600 dark:text-secondary-400">
+                      {employee.role}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                          employee.status === 'Active'
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                            : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                        }`}
+                      >
+                        {employee.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                      <Button variant="ghost" size="sm" onClick={() => handleEmployeeActions(employee.id)}>
+                        <MoreHorizontal className="w-4 h-4" />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <Users className="w-12 h-12 text-secondary-300 mx-auto mb-4" />
+            <p className="text-secondary-500">No employees found</p>
+            <Link to="/employees/new">
+              <Button className="mt-4">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Your First Employee
+              </Button>
+            </Link>
+          </div>
+        )}
       </Card>
     </div>
   )

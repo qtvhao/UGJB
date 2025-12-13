@@ -1,68 +1,61 @@
-import { BookOpen, TrendingUp, Users, Star, ArrowRight } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Link } from 'react-router'
+import { BookOpen, TrendingUp, Users, Star, ArrowRight, Loader2 } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { hrApi } from '@/lib/api'
 
-// Mock data based on US08 - Skill Development Recommendations
-const skillGaps = [
-  { skill: 'Kubernetes', currentLevel: 15, targetLevel: 40, priority: 'High' },
-  { skill: 'Machine Learning', currentLevel: 8, targetLevel: 25, priority: 'High' },
-  { skill: 'GraphQL', currentLevel: 22, targetLevel: 35, priority: 'Medium' },
-  { skill: 'Rust', currentLevel: 5, targetLevel: 15, priority: 'Low' },
-]
+interface SkillGap {
+  skill: string
+  currentLevel: number
+  targetLevel: number
+  priority: string
+}
 
-const recommendations = [
-  {
-    id: 1,
-    employee: 'John Smith',
-    currentSkills: ['React', 'TypeScript', 'Node.js'],
-    recommendedSkill: 'Kubernetes',
-    reason: 'Team needs more DevOps capabilities',
-    courses: ['K8s Fundamentals', 'CKA Certification'],
-  },
-  {
-    id: 2,
-    employee: 'Jane Doe',
-    currentSkills: ['Python', 'Data Analysis'],
-    recommendedSkill: 'Machine Learning',
-    reason: 'Natural progression from data analysis skills',
-    courses: ['ML Foundations', 'TensorFlow Basics'],
-  },
-  {
-    id: 3,
-    employee: 'Bob Johnson',
-    currentSkills: ['Java', 'Spring Boot'],
-    recommendedSkill: 'GraphQL',
-    reason: 'Project migration to GraphQL API',
-    courses: ['GraphQL Mastery', 'Apollo Server'],
-  },
-]
+interface Recommendation {
+  id: number
+  employee: string
+  currentSkills: string[]
+  recommendedSkill: string
+  reason: string
+  courses: string[]
+}
 
-const learningPaths = [
-  {
-    name: 'Cloud Native Developer',
-    skills: ['Docker', 'Kubernetes', 'Terraform'],
-    duration: '3 months',
-    enrolled: 12,
-  },
-  {
-    name: 'Data Science Track',
-    skills: ['Python', 'Machine Learning', 'Deep Learning'],
-    duration: '6 months',
-    enrolled: 8,
-  },
-  {
-    name: 'Full Stack Modern',
-    skills: ['React', 'GraphQL', 'Node.js'],
-    duration: '4 months',
-    enrolled: 15,
-  },
-]
+interface LearningPath {
+  name: string
+  skills: string[]
+  duration: string
+  enrolled: number
+}
 
 export default function SkillDevelopmentPage() {
-  const handleViewAllLearningPaths = () => {
-    // Navigate to full learning paths page - implementation pending
-  }
+  const [skillGaps, setSkillGaps] = useState<SkillGap[]>([])
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([])
+  const [learningPaths, setLearningPaths] = useState<LearningPath[]>([])
+  const [loading, setLoading] = useState(true)
 
+  useEffect(() => {
+    Promise.all([
+      hrApi.skills.gaps(),
+      hrApi.skills.recommendations(),
+      hrApi.learningPaths.list(),
+    ])
+      .then(([gapsRes, recsRes, pathsRes]) => {
+        setSkillGaps(gapsRes.data)
+        setRecommendations(recsRes.data)
+        setLearningPaths(pathsRes.data)
+      })
+      .catch((err) => console.error('Failed to fetch skill development data:', err))
+      .finally(() => setLoading(false))
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+      </div>
+    )
+  }
   return (
     <div className="space-y-6">
       <div>
@@ -217,9 +210,11 @@ export default function SkillDevelopmentPage() {
                 </div>
               ))}
             </div>
-            <Button variant="outline" className="w-full mt-4" onClick={handleViewAllLearningPaths}>
-              View All Learning Paths
-            </Button>
+            <Link to="/skill-development/learning-paths">
+              <Button variant="outline" className="w-full mt-4">
+                View All Learning Paths
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>

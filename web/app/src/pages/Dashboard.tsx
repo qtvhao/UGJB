@@ -88,7 +88,7 @@ export default function Dashboard() {
           { id: 2, type: 'info', message: '5 skills pending approval', link: '/skills' },
           { id: 3, type: 'success', message: 'All integrations healthy', link: '/integrations' },
         ])
-      } catch (err) {
+      } catch {
         setError('Failed to load dashboard data')
         setStats({
           totalEmployees: 156,

@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { NavLink } from 'react-router'
 import { clsx } from 'clsx'
 import {
@@ -19,34 +20,63 @@ import {
   FileCheck,
   RefreshCw,
   FileCode,
+  LucideIcon,
 } from 'lucide-react'
+import { api } from '@/lib/api'
 
 interface SidebarProps {
   open: boolean
   onClose: () => void
 }
 
-const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Employees', href: '/employees', icon: Users },
-  { name: 'Skills Inventory', href: '/skills', icon: BookOpen },
-  { name: 'Assignments', href: '/assignments', icon: Briefcase },
-  { name: 'Team Capacity', href: '/team-capacity', icon: UsersRound },
-  { name: 'Workforce Planning', href: '/workforce-planning', icon: Target },
-  { name: 'Skill Development', href: '/skill-development', icon: Layers },
-  { name: 'Engineering Metrics', href: '/engineering-metrics', icon: Code2 },
-  { name: 'Custom Dashboards', href: '/dashboards', icon: LayoutGrid },
-  { name: 'Incidents', href: '/incidents', icon: AlertTriangle },
-  { name: 'Performance Reviews', href: '/reviews', icon: FileCheck },
-  { name: 'Platform Sync', href: '/platform-sync', icon: RefreshCw },
-  { name: 'Middleware', href: '/middleware', icon: FileCode },
-  { name: 'Automation Rules', href: '/automation', icon: Zap },
-  { name: 'Webhooks', href: '/webhooks', icon: Webhook },
-  { name: 'Integrations', href: '/integrations', icon: Plug },
-  { name: 'Settings', href: '/settings', icon: Settings },
-]
+interface NavigationItem {
+  name: string
+  href: string
+  icon: string
+}
+
+const iconMap: Record<string, LucideIcon> = {
+  LayoutDashboard,
+  Users,
+  Briefcase,
+  Code2,
+  Target,
+  BookOpen,
+  Settings,
+  Plug,
+  Layers,
+  Zap,
+  LayoutGrid,
+  Webhook,
+  UsersRound,
+  AlertTriangle,
+  FileCheck,
+  RefreshCw,
+  FileCode,
+}
+
+const defaultNavigation: NavigationItem[] = []
 
 export function Sidebar({ open, onClose }: SidebarProps) {
+  const [navigation, setNavigation] = useState<NavigationItem[]>(defaultNavigation)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchNavigation() {
+      try {
+        const response = await api.get('/navigation')
+        if (response.data && Array.isArray(response.data)) {
+          setNavigation(response.data)
+        }
+      } catch {
+        // Navigation will remain empty if API fails
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchNavigation()
+  }, [])
+
   return (
     <>
       {/* Mobile sidebar */}
@@ -69,7 +99,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           </button>
         </div>
         <nav className="mt-4 px-2">
-          <NavItems />
+          <NavItems navigation={navigation} loading={loading} />
         </nav>
       </aside>
 
@@ -82,7 +112,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             </span>
           </div>
           <nav className="flex-1 mt-4 px-2 overflow-y-auto">
-            <NavItems />
+            <NavItems navigation={navigation} loading={loading} />
           </nav>
           <div className="p-4 border-t border-secondary-200 dark:border-secondary-700">
             <p className="text-xs text-secondary-500 dark:text-secondary-400">
@@ -95,28 +125,47 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   )
 }
 
-function NavItems() {
+function NavItems({ navigation, loading }: { navigation: NavigationItem[]; loading: boolean }) {
+  if (loading) {
+    return (
+      <div className="flex justify-center py-4">
+        <div className="w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  if (navigation.length === 0) {
+    return (
+      <p className="text-sm text-secondary-500 dark:text-secondary-400 px-3 py-2">
+        No navigation items available
+      </p>
+    )
+  }
+
   return (
     <ul className="space-y-1">
-      {navigation.map((item) => (
-        <li key={item.name}>
-          <NavLink
-            to={item.href}
-            end={item.href === '/'}
-            className={({ isActive }) =>
-              clsx(
-                'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                isActive
-                  ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400'
-                  : 'text-secondary-700 hover:bg-secondary-100 dark:text-secondary-300 dark:hover:bg-secondary-700'
-              )
-            }
-          >
-            <item.icon className="w-5 h-5 flex-shrink-0" />
-            {item.name}
-          </NavLink>
-        </li>
-      ))}
+      {navigation.map((item) => {
+        const Icon = iconMap[item.icon] || LayoutDashboard
+        return (
+          <li key={item.name}>
+            <NavLink
+              to={item.href}
+              end={item.href === '/'}
+              className={({ isActive }) =>
+                clsx(
+                  'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                  isActive
+                    ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400'
+                    : 'text-secondary-700 hover:bg-secondary-100 dark:text-secondary-300 dark:hover:bg-secondary-700'
+                )
+              }
+            >
+              <Icon className="w-5 h-5 flex-shrink-0" />
+              {item.name}
+            </NavLink>
+          </li>
+        )
+      })}
     </ul>
   )
 }

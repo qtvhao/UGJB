@@ -60,14 +60,32 @@ export const hrApi = {
   },
   skills: {
     list: () => api.get('/hr-management/skills'),
+    pending: () => api.get('/hr-management/skills/pending'),
     create: (data: unknown) => api.post('/hr-management/skills', data),
     approve: (id: string) => api.post(`/hr-management/skills/${id}/approve`),
+    reject: (id: string) => api.post(`/hr-management/skills/${id}/reject`),
+    gaps: () => api.get('/hr-management/skills/gaps'),
+    recommendations: () => api.get('/hr-management/skills/recommendations'),
   },
   assignments: {
     list: () => api.get('/hr-management/assignments'),
     create: (data: unknown) => api.post('/hr-management/assignments', data),
     update: (id: string, data: unknown) => api.put(`/hr-management/assignments/${id}`, data),
+    overAllocated: () => api.get('/hr-management/assignments/over-allocated'),
+    resolve: (employeeId: string, data: unknown) => api.post(`/hr-management/assignments/resolve/${employeeId}`, data),
   },
+  learningPaths: {
+    list: () => api.get('/hr-management/learning-paths'),
+    get: (id: string) => api.get(`/hr-management/learning-paths/${id}`),
+    enroll: (id: string, employeeId: string) => api.post(`/hr-management/learning-paths/${id}/enroll`, { employeeId }),
+  },
+}
+
+// Project Management
+export const projectsApi = {
+  list: () => api.get('/project-management/projects'),
+  get: (id: string) => api.get(`/project-management/projects/${id}`),
+  create: (data: unknown) => api.post('/project-management/projects', data),
 }
 
 // Engineering Analytics
@@ -175,11 +193,13 @@ export const dashboardsApi = {
 
 // Capacity (Cluster 0002)
 export const capacityApi = {
-  team: {
+  teams: {
+    list: () => api.get('/hr-management/capacity/teams'),
     get: (id: string) => api.get(`/hr-management/capacity/team/${id}`),
     export: (id: string) => api.post(`/hr-management/capacity/team/${id}/export`),
   },
-  employee: {
+  employees: {
+    list: () => api.get('/hr-management/capacity/employees'),
     get: (id: string) => api.get(`/hr-management/capacity/employee/${id}`),
   },
   alerts: {
