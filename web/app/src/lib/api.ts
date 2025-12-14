@@ -151,6 +151,36 @@ export const wellbeingApi = {
   },
 }
 
+// Workforce Planning
+export const workforcePlanningApi = {
+  metrics: () => api.get('/workforce-planning/metrics'),
+  departmentAllocation: () => api.get('/workforce-planning/department-allocation'),
+  capacityForecast: () => api.get('/workforce-planning/capacity-forecast'),
+}
+
+// Settings
+export const settingsApi = {
+  roles: {
+    list: () => api.get('/settings/roles'),
+    create: (data: unknown) => api.post('/settings/roles', data),
+    update: (id: string, data: unknown) => api.put(`/settings/roles/${id}`, data),
+    delete: (id: string) => api.delete(`/settings/roles/${id}`),
+  },
+  security: {
+    list: () => api.get('/settings/security'),
+    update: (settingName: string, enabled: boolean) =>
+      api.patch(`/settings/security/${settingName}`, { enabled }),
+  },
+  auditLogs: {
+    list: (params?: { action?: string; startDate?: string; endDate?: string }) =>
+      api.get('/settings/audit-logs', { params }),
+    recent: () => api.get('/settings/audit-logs/recent'),
+    export: (params?: { action?: string; startDate?: string; endDate?: string }) =>
+      api.post('/settings/audit-logs/export', params),
+  },
+  availableIntegrations: () => api.get('/settings/available-integrations'),
+}
+
 // Automation (Cluster 0002)
 export const automationApi = {
   rules: {

@@ -1,33 +1,59 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router'
-import { Plus, Search, AlertTriangle } from 'lucide-react'
+import { Plus, Search, AlertTriangle, Loader2 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { hrApi } from '@/lib/api'
 
-// Mock data based on US03 - Workforce Assignment Tracking
-const mockAssignments = [
-  { id: 1, employee: 'John Smith', project: 'UGJB Platform', allocation: 60, role: 'Lead Developer', startDate: '2024-01-01', endDate: null },
-  { id: 2, employee: 'John Smith', project: 'Mobile App', allocation: 40, role: 'Consultant', startDate: '2024-06-01', endDate: null },
-  { id: 3, employee: 'Jane Doe', project: 'UGJB Platform', allocation: 100, role: 'Product Manager', startDate: '2024-01-01', endDate: null },
-  { id: 4, employee: 'Bob Johnson', project: 'Infrastructure', allocation: 50, role: 'Tech Lead', startDate: '2024-03-01', endDate: null },
-  { id: 5, employee: 'Bob Johnson', project: 'UGJB Platform', allocation: 50, role: 'Architect', startDate: '2024-01-01', endDate: null },
-  { id: 6, employee: 'Alice Williams', project: 'Mobile App', allocation: 80, role: 'UX Designer', startDate: '2024-04-01', endDate: null },
-]
+interface Assignment {
+  id: number
+  employee: string
+  project: string
+  allocation: number
+  role: string
+  startDate: string
+  endDate: string | null
+}
 
-// Employees with over-allocation (>100%)
-const overAllocatedEmployees = [
-  { name: 'Charlie Brown', totalAllocation: 120, projects: ['UGJB Platform (70%)', 'Mobile App (50%)'] },
-]
+interface OverAllocatedEmployee {
+  name: string
+  totalAllocation: number
+  projects: string[]
+}
 
 export default function WorkforceAssignmentsPage() {
+  const [assignments, setAssignments] = useState<Assignment[]>([])
+  const [overAllocatedEmployees, setOverAllocatedEmployees] = useState<OverAllocatedEmployee[]>([])
   const [searchQuery, setSearchQuery] = useState('')
+  const [loading, setLoading] = useState(true)
 
-  const filteredAssignments = mockAssignments.filter(
+  useEffect(() => {
+    Promise.all([
+      hrApi.assignments.list(),
+      hrApi.assignments.overAllocated(),
+    ])
+      .then(([assignmentsRes, overAllocatedRes]) => {
+        setAssignments(assignmentsRes.data)
+        setOverAllocatedEmployees(overAllocatedRes.data)
+      })
+      .catch((err) => console.error('Failed to fetch assignments:', err))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const filteredAssignments = assignments.filter(
     (a) =>
       a.employee.toLowerCase().includes(searchQuery.toLowerCase()) ||
       a.project.toLowerCase().includes(searchQuery.toLowerCase())
   )
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">

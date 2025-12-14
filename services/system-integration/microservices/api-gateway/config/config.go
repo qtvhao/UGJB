@@ -9,15 +9,16 @@ import (
 
 // Config holds all application configuration
 type Config struct {
-	Environment string        `mapstructure:"environment"`
-	Port        int           `mapstructure:"port"`
-	Server      ServerConfig  `mapstructure:"server"`
-	JWT         JWTConfig     `mapstructure:"jwt"`
-	RateLimit   RateLimitConfig `mapstructure:"rate_limit"`
-	Redis       RedisConfig   `mapstructure:"redis"`
-	CORS        CORSConfig    `mapstructure:"cors"`
-	OPA         OPAConfig     `mapstructure:"opa"`
-	Services    ServicesConfig `mapstructure:"services"`
+	Environment      string                 `mapstructure:"environment"`
+	Port             int                    `mapstructure:"port"`
+	Server           ServerConfig           `mapstructure:"server"`
+	JWT              JWTConfig              `mapstructure:"jwt"`
+	RateLimit        RateLimitConfig        `mapstructure:"rate_limit"`
+	Redis            RedisConfig            `mapstructure:"redis"`
+	CORS             CORSConfig             `mapstructure:"cors"`
+	OPA              OPAConfig              `mapstructure:"opa"`
+	Services         ServicesConfig         `mapstructure:"services"`
+	ExternalServices ExternalServicesConfig `mapstructure:"external_services"`
 }
 
 // ServerConfig holds server-specific configuration
@@ -70,17 +71,32 @@ type OPAConfig struct {
 
 // ServicesConfig holds backend service endpoints
 type ServicesConfig struct {
-	ProjectManagement     ServiceEndpoint `mapstructure:"project_management"`
-	GoalManagement        ServiceEndpoint `mapstructure:"goal_management"`
-	HRManagement          ServiceEndpoint `mapstructure:"hr_management"`
-	EngineeringAnalytics  ServiceEndpoint `mapstructure:"engineering_analytics"`
-	WorkforceWellbeing    ServiceEndpoint `mapstructure:"workforce_wellbeing"`
+	ProjectManagement    ServiceEndpoint `mapstructure:"project_management"`
+	GoalManagement       ServiceEndpoint `mapstructure:"goal_management"`
+	HRManagement         ServiceEndpoint `mapstructure:"hr_management"`
+	EngineeringAnalytics ServiceEndpoint `mapstructure:"engineering_analytics"`
+	WorkforceWellbeing   ServiceEndpoint `mapstructure:"workforce_wellbeing"`
+	SystemIntegration    ServiceEndpoint `mapstructure:"system_integration"`
 }
 
 // ServiceEndpoint represents a backend service endpoint
 type ServiceEndpoint struct {
 	BaseURL string        `mapstructure:"base_url"`
 	Timeout time.Duration `mapstructure:"timeout"`
+}
+
+// ExternalServicesConfig holds external service endpoints (host machine)
+type ExternalServicesConfig struct {
+	Ollama         ExternalServiceEndpoint `mapstructure:"ollama"`
+	DockerRegistry ExternalServiceEndpoint `mapstructure:"docker_registry"`
+	Frontend       ExternalServiceEndpoint `mapstructure:"frontend"`
+}
+
+// ExternalServiceEndpoint represents an external service endpoint
+type ExternalServiceEndpoint struct {
+	BaseURL   string        `mapstructure:"base_url"`
+	Timeout   time.Duration `mapstructure:"timeout"`
+	WebSocket bool          `mapstructure:"websocket"`
 }
 
 // LoadConfig loads configuration from environment variables and config files
@@ -160,20 +176,34 @@ func setDefaults() {
 	viper.SetDefault("opa.bundle_url", "")
 
 	// Backend Services
-	viper.SetDefault("services.project_management.base_url", "http://localhost:8061")
+	viper.SetDefault("services.project_management.base_url", "http://project-management:8004")
 	viper.SetDefault("services.project_management.timeout", 30*time.Second)
 
-	viper.SetDefault("services.goal_management.base_url", "http://localhost:8062")
+	viper.SetDefault("services.goal_management.base_url", "http://goal-management:8002")
 	viper.SetDefault("services.goal_management.timeout", 30*time.Second)
 
-	viper.SetDefault("services.hr_management.base_url", "http://localhost:8063")
+	viper.SetDefault("services.hr_management.base_url", "http://hr-management:8003")
 	viper.SetDefault("services.hr_management.timeout", 30*time.Second)
 
-	viper.SetDefault("services.engineering_analytics.base_url", "http://localhost:8064")
+	viper.SetDefault("services.engineering_analytics.base_url", "http://engineering-analytics:8001")
 	viper.SetDefault("services.engineering_analytics.timeout", 30*time.Second)
 
-	viper.SetDefault("services.workforce_wellbeing.base_url", "http://localhost:8065")
+	viper.SetDefault("services.workforce_wellbeing.base_url", "http://workforce-wellbeing:8006")
 	viper.SetDefault("services.workforce_wellbeing.timeout", 30*time.Second)
+
+	viper.SetDefault("services.system_integration.base_url", "http://system-integration:8005")
+	viper.SetDefault("services.system_integration.timeout", 30*time.Second)
+
+	// External Services (host machine)
+	viper.SetDefault("external_services.ollama.base_url", "http://host.docker.internal:11434")
+	viper.SetDefault("external_services.ollama.timeout", 600*time.Second)
+
+	viper.SetDefault("external_services.docker_registry.base_url", "http://host.docker.internal:5006")
+	viper.SetDefault("external_services.docker_registry.timeout", 60*time.Second)
+
+	viper.SetDefault("external_services.frontend.base_url", "http://host.docker.internal:3000")
+	viper.SetDefault("external_services.frontend.timeout", 30*time.Second)
+	viper.SetDefault("external_services.frontend.websocket", true)
 }
 
 func validateConfig(cfg *Config) error {

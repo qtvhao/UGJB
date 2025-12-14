@@ -1,36 +1,70 @@
-import { Users, TrendingUp, AlertTriangle, Target } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Users, TrendingUp, AlertTriangle, Target, Loader2 } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
+import { workforcePlanningApi, wellbeingApi } from '@/lib/api'
 
-// Mock data based on US07 - Workforce Planning Dashboard
-const workforceMetrics = {
-  totalHeadcount: 156,
-  activeProjects: 24,
-  avgUtilization: 82,
-  burnoutRiskCount: 3,
+interface WorkforceMetrics {
+  totalHeadcount: number
+  activeProjects: number
+  avgUtilization: number
+  burnoutRiskCount: number
 }
 
-const departmentAllocation = [
-  { name: 'Engineering', headcount: 85, utilization: 88 },
-  { name: 'Product', headcount: 22, utilization: 75 },
-  { name: 'Design', headcount: 18, utilization: 82 },
-  { name: 'QA', headcount: 15, utilization: 78 },
-  { name: 'DevOps', headcount: 16, utilization: 90 },
-]
+interface DepartmentAllocation {
+  name: string
+  headcount: number
+  utilization: number
+}
 
-const burnoutRiskEmployees = [
-  { name: 'Sarah Connor', department: 'Engineering', riskScore: 85, factors: ['High overtime', 'Multiple projects'] },
-  { name: 'Mike Ross', department: 'DevOps', riskScore: 78, factors: ['On-call fatigue', 'High workload'] },
-  { name: 'Lisa Chen', department: 'Engineering', riskScore: 72, factors: ['Sprint overload', 'Technical debt'] },
-]
+interface BurnoutRiskEmployee {
+  name: string
+  department: string
+  riskScore: number
+  factors: string[]
+}
 
-const capacityForecast = [
-  { month: 'Jan', demand: 145, capacity: 156 },
-  { month: 'Feb', demand: 152, capacity: 156 },
-  { month: 'Mar', demand: 168, capacity: 160 },
-  { month: 'Apr', demand: 175, capacity: 165 },
-]
+interface CapacityForecast {
+  month: string
+  demand: number
+  capacity: number
+}
 
 export default function WorkforcePlanningPage() {
+  const [workforceMetrics, setWorkforceMetrics] = useState<WorkforceMetrics>({
+    totalHeadcount: 0,
+    activeProjects: 0,
+    avgUtilization: 0,
+    burnoutRiskCount: 0,
+  })
+  const [departmentAllocation, setDepartmentAllocation] = useState<DepartmentAllocation[]>([])
+  const [burnoutRiskEmployees, setBurnoutRiskEmployees] = useState<BurnoutRiskEmployee[]>([])
+  const [capacityForecast, setCapacityForecast] = useState<CapacityForecast[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    Promise.all([
+      workforcePlanningApi.metrics(),
+      workforcePlanningApi.departmentAllocation(),
+      workforcePlanningApi.capacityForecast(),
+      wellbeingApi.burnoutRisk.list(),
+    ])
+      .then(([metricsRes, deptRes, forecastRes, burnoutRes]) => {
+        setWorkforceMetrics(metricsRes.data)
+        setDepartmentAllocation(deptRes.data)
+        setCapacityForecast(forecastRes.data)
+        setBurnoutRiskEmployees(burnoutRes.data)
+      })
+      .catch((err) => console.error('Failed to fetch workforce planning data:', err))
+      .finally(() => setLoading(false))
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+      </div>
+    )
+  }
   return (
     <div className="space-y-6">
       <div>

@@ -1,34 +1,49 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router'
-import { Plus, Search, CheckCircle, Clock, XCircle } from 'lucide-react'
+import { Plus, Search, CheckCircle, Clock, XCircle, Loader2 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { hrApi } from '@/lib/api'
 
-// Mock data based on US02 - Skills Inventory Management
-const mockSkills = [
-  { id: 1, name: 'React', category: 'Frontend', employeeCount: 45, status: 'Approved' },
-  { id: 2, name: 'TypeScript', category: 'Language', employeeCount: 52, status: 'Approved' },
-  { id: 3, name: 'Python', category: 'Language', employeeCount: 38, status: 'Approved' },
-  { id: 4, name: 'Kubernetes', category: 'DevOps', employeeCount: 15, status: 'Approved' },
-  { id: 5, name: 'GraphQL', category: 'API', employeeCount: 22, status: 'Approved' },
-  { id: 6, name: 'Rust', category: 'Language', employeeCount: 5, status: 'Pending' },
-  { id: 7, name: 'WebAssembly', category: 'Runtime', employeeCount: 3, status: 'Pending' },
-]
+interface Skill {
+  id: number
+  name: string
+  category: string
+  employeeCount: number
+  status: string
+}
 
 const categories = ['All', 'Frontend', 'Backend', 'Language', 'DevOps', 'API', 'Runtime']
 
 export default function SkillsInventoryPage() {
+  const [skills, setSkills] = useState<Skill[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
+  const [loading, setLoading] = useState(true)
 
-  const filteredSkills = mockSkills.filter((skill) => {
+  useEffect(() => {
+    hrApi.skills.list()
+      .then((res) => setSkills(res.data))
+      .catch((err) => console.error('Failed to fetch skills:', err))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const filteredSkills = skills.filter((skill) => {
     const matchesSearch = skill.name.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesCategory = selectedCategory === 'All' || skill.category === selectedCategory
     return matchesSearch && matchesCategory
   })
 
-  const pendingSkills = mockSkills.filter((s) => s.status === 'Pending')
+  const pendingSkills = skills.filter((s) => s.status === 'Pending')
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">

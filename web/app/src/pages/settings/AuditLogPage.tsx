@@ -1,35 +1,38 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router'
-import { ArrowLeft, Search, Filter, Download, Shield } from 'lucide-react'
+import { ArrowLeft, Search, Filter, Download, Shield, Loader2 } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { settingsApi } from '@/lib/api'
 
-// Mock audit log data
-const allAuditLogs = [
-  { id: 1, action: 'User login', user: 'john.smith@company.com', timestamp: '2024-01-15T14:30:00Z', ip: '192.168.1.100', details: 'Successful login via SSO' },
-  { id: 2, action: 'Role updated', user: 'admin@company.com', timestamp: '2024-01-15T12:15:00Z', ip: '192.168.1.50', details: 'Modified Manager role permissions' },
-  { id: 3, action: 'Integration connected', user: 'admin@company.com', timestamp: '2024-01-15T10:00:00Z', ip: '192.168.1.50', details: 'Connected GitLab integration' },
-  { id: 4, action: 'Employee created', user: 'hr@company.com', timestamp: '2024-01-14T16:45:00Z', ip: '192.168.1.75', details: 'Created employee: Alice Johnson' },
-  { id: 5, action: 'User logout', user: 'jane.doe@company.com', timestamp: '2024-01-14T15:30:00Z', ip: '192.168.1.120', details: 'Manual logout' },
-  { id: 6, action: 'Password changed', user: 'bob.wilson@company.com', timestamp: '2024-01-14T14:00:00Z', ip: '192.168.1.90', details: 'User changed their password' },
-  { id: 7, action: 'Permission denied', user: 'viewer@company.com', timestamp: '2024-01-14T11:20:00Z', ip: '192.168.1.200', details: 'Attempted to access admin panel' },
-  { id: 8, action: 'Employee updated', user: 'hr@company.com', timestamp: '2024-01-14T10:30:00Z', ip: '192.168.1.75', details: 'Updated skills for John Smith' },
-  { id: 9, action: 'API key generated', user: 'admin@company.com', timestamp: '2024-01-13T16:00:00Z', ip: '192.168.1.50', details: 'New API key for automation' },
-  { id: 10, action: 'User login failed', user: 'unknown@external.com', timestamp: '2024-01-13T09:45:00Z', ip: '203.45.67.89', details: 'Invalid credentials - 3 attempts' },
-  { id: 11, action: 'Settings changed', user: 'admin@company.com', timestamp: '2024-01-12T14:15:00Z', ip: '192.168.1.50', details: 'Enabled IP whitelist' },
-  { id: 12, action: 'Role created', user: 'admin@company.com', timestamp: '2024-01-12T11:00:00Z', ip: '192.168.1.50', details: 'Created Team Lead role' },
-]
+interface AuditLog {
+  id: number
+  action: string
+  user: string
+  timestamp: string
+  ip: string
+  details: string
+}
 
 const actionTypes = ['All', 'User login', 'User logout', 'Role updated', 'Role created', 'Employee created', 'Employee updated', 'Permission denied', 'Settings changed']
 
 export default function AuditLogPage() {
   const navigate = useNavigate()
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedAction, setSelectedAction] = useState('All')
   const [dateRange, setDateRange] = useState({ start: '', end: '' })
+  const [loading, setLoading] = useState(true)
 
-  const filteredLogs = allAuditLogs.filter((log) => {
+  useEffect(() => {
+    settingsApi.auditLogs.list()
+      .then((res) => setAuditLogs(res.data))
+      .catch((err) => console.error('Failed to fetch audit logs:', err))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const filteredLogs = auditLogs.filter((log) => {
     const matchesSearch =
       log.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
       log.action.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -39,9 +42,21 @@ export default function AuditLogPage() {
   })
 
   const handleExport = () => {
-    // In a real app, this would generate and download a CSV/JSON file
-    console.log('Exporting audit logs:', filteredLogs)
-    alert('Audit log export started. You will receive the file shortly.')
+    settingsApi.auditLogs.export({
+      action: selectedAction !== 'All' ? selectedAction : undefined,
+      startDate: dateRange.start || undefined,
+      endDate: dateRange.end || undefined,
+    })
+      .then(() => alert('Audit log export started. You will receive the file shortly.'))
+      .catch((err) => console.error('Failed to export audit logs:', err))
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+      </div>
+    )
   }
 
   const getActionColor = (action: string) => {

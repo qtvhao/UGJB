@@ -42,6 +42,8 @@ cors:
     - "Accept"
     - "Authorization"
     - "X-Request-ID"
+    - "Upgrade"
+    - "Connection"
   expose_headers:
     - "Content-Length"
     - "X-Request-ID"
@@ -53,23 +55,43 @@ opa:
   policy_path: "./policies"
   bundle_url: ""
 
+# Backend microservices (internal Docker network)
 services:
   project_management:
-    base_url: "http://localhost:8061"
+    base_url: "http://project-management:8004"
     timeout: 30s
 
   goal_management:
-    base_url: "http://localhost:8062"
+    base_url: "http://goal-management:8002"
     timeout: 30s
 
   hr_management:
-    base_url: "http://localhost:8063"
+    base_url: "http://hr-management:8003"
     timeout: 30s
 
   engineering_analytics:
-    base_url: "http://localhost:8064"
+    base_url: "http://engineering-analytics:8001"
     timeout: 30s
 
   workforce_wellbeing:
-    base_url: "http://localhost:8065"
+    base_url: "http://workforce-wellbeing:8006"
     timeout: 30s
+
+  system_integration:
+    base_url: "http://system-integration:8005"
+    timeout: 30s
+
+# External services (host machine via host.docker.internal)
+external_services:
+  ollama:
+    base_url: "http://host.docker.internal:11434"
+    timeout: 600s  # LLM requests can take longer
+
+  docker_registry:
+    base_url: "http://host.docker.internal:5006"
+    timeout: 60s
+
+  frontend:
+    base_url: "http://host.docker.internal:3000"
+    timeout: 30s
+    websocket: true  # Enable WebSocket upgrade for HMR

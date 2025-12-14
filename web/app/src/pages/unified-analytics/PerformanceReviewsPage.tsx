@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -13,8 +13,10 @@ import {
   TrendingDown,
   User,
   Calendar,
+  Loader2,
 } from 'lucide-react'
 import { clsx } from 'clsx'
+import { unifiedAnalyticsApi } from '@/lib/api'
 
 interface PerformanceReview {
   id: string
@@ -42,84 +44,6 @@ interface PerformanceReview {
   updatedAt: string
 }
 
-const mockReviews: PerformanceReview[] = [
-  {
-    id: 'REV-001',
-    employeeId: 'emp_12345',
-    employeeName: 'John Doe',
-    reviewPeriod: 'Q4 2024',
-    status: 'pending_manager',
-    doraMetrics: {
-      deploymentFrequency: 12,
-      leadTime: 48,
-      changeFailureRate: 5,
-      mttr: 2,
-    },
-    codeActivity: {
-      commits: 145,
-      pullRequests: 23,
-      codeReviews: 67,
-    },
-    flagged: false,
-    flagReason: null,
-    managerApproved: false,
-    hrApproved: false,
-    qualitativeAssessment: null,
-    createdAt: '2025-12-01T00:00:00Z',
-    updatedAt: '2025-12-08T10:00:00Z',
-  },
-  {
-    id: 'REV-002',
-    employeeId: 'emp_67890',
-    employeeName: 'Jane Smith',
-    reviewPeriod: 'Q4 2024',
-    status: 'draft',
-    doraMetrics: {
-      deploymentFrequency: 5,
-      leadTime: 96,
-      changeFailureRate: 15,
-      mttr: 8,
-    },
-    codeActivity: {
-      commits: 67,
-      pullRequests: 12,
-      codeReviews: 34,
-    },
-    flagged: true,
-    flagReason: 'Deployment frequency decline (50% drop)',
-    managerApproved: false,
-    hrApproved: false,
-    qualitativeAssessment: null,
-    createdAt: '2025-12-01T00:00:00Z',
-    updatedAt: '2025-12-08T09:00:00Z',
-  },
-  {
-    id: 'REV-003',
-    employeeId: 'emp_11111',
-    employeeName: 'Bob Wilson',
-    reviewPeriod: 'Q4 2024',
-    status: 'finalized',
-    doraMetrics: {
-      deploymentFrequency: 18,
-      leadTime: 24,
-      changeFailureRate: 2,
-      mttr: 1,
-    },
-    codeActivity: {
-      commits: 198,
-      pullRequests: 31,
-      codeReviews: 89,
-    },
-    flagged: false,
-    flagReason: null,
-    managerApproved: true,
-    hrApproved: true,
-    qualitativeAssessment: 'Excellent performance with strong mentorship contributions.',
-    createdAt: '2025-12-01T00:00:00Z',
-    updatedAt: '2025-12-07T16:00:00Z',
-  },
-]
-
 const statusColors = {
   draft: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
   pending_manager: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
@@ -137,9 +61,16 @@ const statusLabels = {
 export default function PerformanceReviewsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
-  const [reviews] = useState<PerformanceReview[]>(mockReviews)
-
+  const [reviews, setReviews] = useState<PerformanceReview[]>([])
+  const [loading, setLoading] = useState(true)
   const [selectedReviewId, setSelectedReviewId] = useState<string | null>(null)
+
+  useEffect(() => {
+    unifiedAnalyticsApi.reviews.list()
+      .then((res) => setReviews(res.data))
+      .catch((err) => console.error('Failed to fetch performance reviews:', err))
+      .finally(() => setLoading(false))
+  }, [])
 
   const handleReview = (reviewId: string) => {
     setSelectedReviewId(selectedReviewId === reviewId ? null : reviewId)
@@ -159,6 +90,14 @@ export default function PerformanceReviewsPage() {
   ).length
   const finalizedCount = reviews.filter((r) => r.status === 'finalized').length
   const flaggedCount = reviews.filter((r) => r.flagged).length
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">

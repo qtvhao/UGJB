@@ -12,13 +12,27 @@ import (
 func SetupRoutes(router *gin.Engine, cfg *config.Config, logger *zap.Logger) {
 	// Health check endpoints (no authentication required)
 	health := handlers.NewHealthHandler(logger)
-	router.GET("/", health.Health)
 	router.GET("/health", health.Health)
 	router.GET("/health/ready", health.Ready)
 	router.GET("/health/live", health.Live)
 
 	// Create proxy handler
 	proxy := handlers.NewProxyHandler(cfg, logger)
+
+	// ============================================
+	// External Services (no authentication)
+	// ============================================
+
+	// Ollama LLM API routes
+	router.POST("/api/generate", proxy.ProxyToExternalService("ollama", "/api/generate"))
+	router.POST("/api/chat", proxy.ProxyToExternalService("ollama", "/api/chat"))
+	router.POST("/api/embeddings", proxy.ProxyToExternalService("ollama", "/api/embeddings"))
+
+	// Docker Registry V2 API
+	registry := router.Group("/v2")
+	{
+		registry.Any("/*path", proxy.ProxyToExternalService("docker_registry", "/v2"))
+	}
 
 	// API version 1 routes
 	v1 := router.Group("/api/v1")
@@ -135,6 +149,9 @@ func SetupRoutes(router *gin.Engine, cfg *config.Config, logger *zap.Logger) {
 		}
 	}
 
-	// Catch-all for undefined routes
-	router.NoRoute(handlers.NotFound)
+	// ============================================
+	// Frontend (catch-all, supports WebSocket for HMR)
+	// ============================================
+	// This must be last to allow other routes to match first
+	router.NoRoute(proxy.ProxyWithWebSocket("frontend"))
 }

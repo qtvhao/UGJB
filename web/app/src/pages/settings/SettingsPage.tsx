@@ -1,70 +1,72 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router'
-import { Shield, Users, Key, Database, Lock } from 'lucide-react'
+import { Shield, Users, Key, Database, Lock, Loader2 } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { settingsApi } from '@/lib/api'
 
-// Mock data based on US06 - Role-Based Access Control
-const roles = [
-  {
-    id: 1,
-    name: 'Admin',
-    description: 'Full system access',
-    permissions: ['read', 'write', 'delete', 'admin'],
-    userCount: 3,
-  },
-  {
-    id: 2,
-    name: 'Manager',
-    description: 'Team management and reporting',
-    permissions: ['read', 'write'],
-    userCount: 12,
-  },
-  {
-    id: 3,
-    name: 'Developer',
-    description: 'Engineering metrics access',
-    permissions: ['read'],
-    userCount: 85,
-  },
-  {
-    id: 4,
-    name: 'HR',
-    description: 'Employee and skills management',
-    permissions: ['read', 'write'],
-    userCount: 8,
-  },
-  {
-    id: 5,
-    name: 'Viewer',
-    description: 'Read-only dashboard access',
-    permissions: ['read'],
-    userCount: 48,
-  },
-]
+interface Role {
+  id: number
+  name: string
+  description: string
+  permissions: string[]
+  userCount: number
+}
 
-const securitySettings = [
-  { name: 'Two-Factor Authentication', enabled: true, description: 'Require 2FA for all users' },
-  { name: 'Session Timeout', enabled: true, description: '30 minutes of inactivity' },
-  { name: 'IP Whitelist', enabled: false, description: 'Restrict access to specific IPs' },
-  { name: 'SSO Integration', enabled: true, description: 'SAML 2.0 with Okta' },
-]
+interface SecuritySetting {
+  name: string
+  enabled: boolean
+  description: string
+}
 
-const auditLogs = [
-  { id: 1, action: 'User login', user: 'john.smith@company.com', timestamp: '2024-01-15T14:30:00Z', ip: '192.168.1.100' },
-  { id: 2, action: 'Role updated', user: 'admin@company.com', timestamp: '2024-01-15T12:15:00Z', ip: '192.168.1.50' },
-  { id: 3, action: 'Integration connected', user: 'admin@company.com', timestamp: '2024-01-15T10:00:00Z', ip: '192.168.1.50' },
-  { id: 4, action: 'Employee created', user: 'hr@company.com', timestamp: '2024-01-14T16:45:00Z', ip: '192.168.1.75' },
-]
+interface AuditLog {
+  id: number
+  action: string
+  user: string
+  timestamp: string
+  ip: string
+}
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<'roles' | 'security' | 'audit'>('roles')
-  const [securityStates, setSecurityStates] = useState<Record<string, boolean>>(
-    Object.fromEntries(securitySettings.map(s => [s.name, s.enabled]))
-  )
+  const [roles, setRoles] = useState<Role[]>([])
+  const [securitySettings, setSecuritySettings] = useState<SecuritySetting[]>([])
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([])
+  const [loading, setLoading] = useState(true)
+  const [securityStates, setSecurityStates] = useState<Record<string, boolean>>({})
+
+  useEffect(() => {
+    Promise.all([
+      settingsApi.roles.list(),
+      settingsApi.security.list(),
+      settingsApi.auditLogs.recent(),
+    ])
+      .then(([rolesRes, securityRes, auditRes]) => {
+        setRoles(rolesRes.data)
+        setSecuritySettings(securityRes.data)
+        setAuditLogs(auditRes.data)
+        setSecurityStates(Object.fromEntries(securityRes.data.map((s: SecuritySetting) => [s.name, s.enabled])))
+      })
+      .catch((err) => console.error('Failed to fetch settings:', err))
+      .finally(() => setLoading(false))
+  }, [])
 
   const handleSecurityToggle = (settingName: string) => {
-    setSecurityStates(prev => ({ ...prev, [settingName]: !prev[settingName] }))
+    const newEnabled = !securityStates[settingName]
+    setSecurityStates(prev => ({ ...prev, [settingName]: newEnabled }))
+    settingsApi.security.update(settingName, newEnabled)
+      .catch((err) => {
+        console.error('Failed to update security setting:', err)
+        setSecurityStates(prev => ({ ...prev, [settingName]: !newEnabled }))
+      })
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+      </div>
+    )
   }
 
   return (

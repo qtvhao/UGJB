@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import {
@@ -11,8 +11,10 @@ import {
   ArrowRightLeft,
   Play,
   History,
+  Loader2,
 } from 'lucide-react'
 import { clsx } from 'clsx'
+import { unifiedAnalyticsApi } from '@/lib/api'
 
 interface PlatformSync {
   id: string
@@ -36,95 +38,6 @@ interface SyncLog {
   errorDetails: string | null
 }
 
-// Mock data for demonstration
-const mockPlatforms: PlatformSync[] = [
-  {
-    id: 'sync-001',
-    platform: 'lattice',
-    direction: 'bidirectional',
-    lastSyncAt: '2025-12-08T10:00:00Z',
-    nextSyncAt: '2025-12-08T11:00:00Z',
-    status: 'success',
-    syncFrequency: 'hourly',
-    recordsProcessed: 156,
-    errorMessage: null,
-  },
-  {
-    id: 'sync-002',
-    platform: 'monday',
-    direction: 'bidirectional',
-    lastSyncAt: '2025-12-08T09:45:00Z',
-    nextSyncAt: '2025-12-08T10:45:00Z',
-    status: 'success',
-    syncFrequency: 'hourly',
-    recordsProcessed: 234,
-    errorMessage: null,
-  },
-  {
-    id: 'sync-003',
-    platform: 'devlake',
-    direction: 'inbound',
-    lastSyncAt: '2025-12-08T10:30:00Z',
-    nextSyncAt: '2025-12-08T10:35:00Z',
-    status: 'syncing',
-    syncFrequency: 'realtime',
-    recordsProcessed: 0,
-    errorMessage: null,
-  },
-  {
-    id: 'sync-004',
-    platform: 'jira',
-    direction: 'inbound',
-    lastSyncAt: '2025-12-08T06:00:00Z',
-    nextSyncAt: '2025-12-09T06:00:00Z',
-    status: 'error',
-    syncFrequency: 'daily',
-    recordsProcessed: 0,
-    errorMessage: 'API rate limit exceeded. Retry in 1 hour.',
-  },
-  {
-    id: 'sync-005',
-    platform: 'gitlab',
-    direction: 'inbound',
-    lastSyncAt: '2025-12-08T10:00:00Z',
-    nextSyncAt: '2025-12-08T11:00:00Z',
-    status: 'success',
-    syncFrequency: 'hourly',
-    recordsProcessed: 89,
-    errorMessage: null,
-  },
-]
-
-const mockLogs: SyncLog[] = [
-  {
-    id: 'log-001',
-    platformId: 'sync-001',
-    startedAt: '2025-12-08T10:00:00Z',
-    completedAt: '2025-12-08T10:02:15Z',
-    status: 'success',
-    recordsProcessed: 156,
-    errorDetails: null,
-  },
-  {
-    id: 'log-002',
-    platformId: 'sync-002',
-    startedAt: '2025-12-08T09:45:00Z',
-    completedAt: '2025-12-08T09:48:32Z',
-    status: 'success',
-    recordsProcessed: 234,
-    errorDetails: null,
-  },
-  {
-    id: 'log-003',
-    platformId: 'sync-004',
-    startedAt: '2025-12-08T06:00:00Z',
-    completedAt: '2025-12-08T06:00:45Z',
-    status: 'error',
-    recordsProcessed: 0,
-    errorDetails: 'API rate limit exceeded (429). Jira API returned: Too Many Requests',
-  },
-]
-
 const platformColors = {
   lattice: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
   monday: 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-400',
@@ -147,22 +60,39 @@ const directionLabels = {
 }
 
 export default function PlatformSyncPage() {
-  const [platforms] = useState<PlatformSync[]>(mockPlatforms)
-  const [logs] = useState<SyncLog[]>(mockLogs)
+  const [platforms, setPlatforms] = useState<PlatformSync[]>([])
+  const [logs, setLogs] = useState<SyncLog[]>([])
+  const [loading, setLoading] = useState(true)
   const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null)
-
   const [, setSyncing] = useState<string[]>([])
   const [historyId, setHistoryId] = useState<string | null>(null)
 
+  useEffect(() => {
+    Promise.all([
+      unifiedAnalyticsApi.syncs.list(),
+      unifiedAnalyticsApi.syncs.getLogs('all'),
+    ])
+      .then(([platformsRes, logsRes]) => {
+        setPlatforms(platformsRes.data)
+        setLogs(logsRes.data)
+      })
+      .catch((err) => console.error('Failed to fetch platform sync data:', err))
+      .finally(() => setLoading(false))
+  }, [])
+
   const handleSyncAll = () => {
     setSyncing(platforms.map((p) => p.id))
-    setTimeout(() => setSyncing([]), 2000)
+    unifiedAnalyticsApi.syncs.list()
+      .then(() => setTimeout(() => setSyncing([]), 2000))
+      .catch((err) => console.error('Failed to sync all:', err))
   }
 
   const handleSyncPlatform = (platformId: string, e: React.MouseEvent) => {
     e.stopPropagation()
     setSyncing((prev) => [...prev, platformId])
-    setTimeout(() => setSyncing((prev) => prev.filter((id) => id !== platformId)), 2000)
+    unifiedAnalyticsApi.syncs.execute(platformId)
+      .then(() => setTimeout(() => setSyncing((prev) => prev.filter((id) => id !== platformId)), 2000))
+      .catch((err) => console.error('Failed to sync platform:', err))
   }
 
   const handleViewHistory = (platformId: string, e: React.MouseEvent) => {
@@ -176,6 +106,14 @@ export default function PlatformSyncPage() {
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleString()
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+      </div>
+    )
   }
 
   return (

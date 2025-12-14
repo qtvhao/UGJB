@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router'
-import { Plus, CheckCircle, XCircle, RefreshCw, Settings, ExternalLink } from 'lucide-react'
+import { Plus, CheckCircle, XCircle, RefreshCw, Settings, ExternalLink, Loader2 } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { integrationApi } from '@/lib/api'
+import { integrationApi, settingsApi } from '@/lib/api'
 
 interface Integration {
   id: number
@@ -22,35 +22,24 @@ interface AvailableIntegration {
   description: string
 }
 
-const defaultIntegrations: Integration[] = [
-  { id: 1, name: 'Jira', type: 'Project Management', status: 'connected', lastSync: '2024-01-15T14:30:00Z', syncFrequency: '15 min', metrics: { items: 1250, synced: 1248 } },
-  { id: 2, name: 'GitLab', type: 'Version Control', status: 'connected', lastSync: '2024-01-15T14:25:00Z', syncFrequency: '5 min', metrics: { items: 5420, synced: 5420 } },
-  { id: 3, name: 'GitHub', type: 'Version Control', status: 'connected', lastSync: '2024-01-15T14:28:00Z', syncFrequency: '5 min', metrics: { items: 3210, synced: 3208 } },
-  { id: 4, name: 'Firebase', type: 'Analytics', status: 'error', lastSync: '2024-01-15T10:00:00Z', syncFrequency: '30 min', metrics: { items: 0, synced: 0 }, error: 'Authentication token expired' },
-  { id: 5, name: 'Slack', type: 'Communication', status: 'connected', lastSync: '2024-01-15T14:20:00Z', syncFrequency: 'Real-time', metrics: { items: 890, synced: 890 } },
-  { id: 6, name: 'Azure DevOps', type: 'CI/CD', status: 'disconnected', lastSync: null, syncFrequency: '-', metrics: { items: 0, synced: 0 } },
-]
-
-const defaultAvailableIntegrations: AvailableIntegration[] = [
-  { name: 'Jenkins', type: 'CI/CD', description: 'CI/CD pipeline automation' },
-  { name: 'Confluence', type: 'Documentation', description: 'Team documentation' },
-  { name: 'PagerDuty', type: 'Incident Management', description: 'On-call and incident response' },
-]
-
 export default function IntegrationsPage() {
   const navigate = useNavigate()
-  const [integrations, setIntegrations] = useState<Integration[]>(defaultIntegrations)
-  const [availableIntegrations] = useState<AvailableIntegration[]>(defaultAvailableIntegrations)
-  const [, setLoading] = useState(true)
+  const [integrations, setIntegrations] = useState<Integration[]>([])
+  const [availableIntegrations, setAvailableIntegrations] = useState<AvailableIntegration[]>([])
+  const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState<number | null>(null)
 
   useEffect(() => {
-    async function fetchIntegrations() {
+    async function fetchData() {
       try {
         setLoading(true)
-        const response = await integrationApi.connections.list()
-        if (response.data && Array.isArray(response.data)) {
-          const mapped = response.data.map((item: { id: number; name: string; type: string; status: string; lastSync: string; syncFrequency: string; metrics?: { items: number; synced: number }; error?: string }, index: number) => ({
+        const [connectionsRes, availableRes] = await Promise.all([
+          integrationApi.connections.list(),
+          settingsApi.availableIntegrations(),
+        ])
+
+        if (connectionsRes.data && Array.isArray(connectionsRes.data)) {
+          const mapped = connectionsRes.data.map((item: { id: number; name: string; type: string; status: string; lastSync: string; syncFrequency: string; metrics?: { items: number; synced: number }; error?: string }, index: number) => ({
             id: item.id || index + 1,
             name: item.name,
             type: item.type,
@@ -62,14 +51,18 @@ export default function IntegrationsPage() {
           }))
           setIntegrations(mapped)
         }
-      } catch {
-        setIntegrations(defaultIntegrations)
+
+        if (availableRes.data && Array.isArray(availableRes.data)) {
+          setAvailableIntegrations(availableRes.data)
+        }
+      } catch (err) {
+        console.error('Failed to fetch integrations:', err)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchIntegrations()
+    fetchData()
   }, [])
 
   const handleSync = async (id: number) => {
@@ -93,6 +86,14 @@ export default function IntegrationsPage() {
 
   const connectedCount = integrations.filter((i) => i.status === 'connected').length
   const errorCount = integrations.filter((i) => i.status === 'error').length
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">

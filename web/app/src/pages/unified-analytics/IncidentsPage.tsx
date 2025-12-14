@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -12,8 +12,10 @@ import {
   XCircle,
   GitCommit,
   Server,
+  Loader2,
 } from 'lucide-react'
 import { clsx } from 'clsx'
+import { unifiedAnalyticsApi } from '@/lib/api'
 
 interface Incident {
   id: string
@@ -27,57 +29,6 @@ interface Incident {
   createdAt: string
   updatedAt: string
 }
-
-const initialIncidents: Incident[] = [
-  {
-    id: 'INC-001',
-    title: 'Payment Service Timeout',
-    service: 'payment-service',
-    severity: 'critical',
-    source: 'prometheus',
-    attributedTo: 'John Doe',
-    attributionMethod: 'service_ownership',
-    status: 'attributed',
-    createdAt: '2025-12-08T10:30:00Z',
-    updatedAt: '2025-12-08T10:35:00Z',
-  },
-  {
-    id: 'INC-002',
-    title: 'Mobile App Crash - Checkout Flow',
-    service: 'mobile-app',
-    severity: 'high',
-    source: 'firebase',
-    attributedTo: 'Jane Smith',
-    attributionMethod: 'commit_correlation',
-    status: 'attributed',
-    createdAt: '2025-12-08T09:15:00Z',
-    updatedAt: '2025-12-08T09:20:00Z',
-  },
-  {
-    id: 'INC-003',
-    title: 'API Gateway High Latency',
-    service: 'api-gateway',
-    severity: 'medium',
-    source: 'prometheus',
-    attributedTo: null,
-    attributionMethod: null,
-    status: 'open',
-    createdAt: '2025-12-08T08:45:00Z',
-    updatedAt: '2025-12-08T08:45:00Z',
-  },
-  {
-    id: 'INC-004',
-    title: 'Database Connection Pool Exhausted',
-    service: 'database-service',
-    severity: 'critical',
-    source: 'prometheus',
-    attributedTo: 'Bob Wilson',
-    attributionMethod: 'manual_assignment',
-    status: 'resolved',
-    createdAt: '2025-12-07T22:10:00Z',
-    updatedAt: '2025-12-08T06:30:00Z',
-  },
-]
 
 const severityColors = {
   critical: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
@@ -96,11 +47,21 @@ const statusIcons = {
 export default function IncidentsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
-  const [incidents, setIncidents] = useState<Incident[]>(initialIncidents)
+  const [incidents, setIncidents] = useState<Incident[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    unifiedAnalyticsApi.incidents.list()
+      .then((res) => setIncidents(res.data))
+      .catch((err) => console.error('Failed to fetch incidents:', err))
+      .finally(() => setLoading(false))
+  }, [])
 
   const handleAssign = (id: string) => {
-    setIncidents((prev) => prev.map((i) => (i.id === id ? { ...i, status: 'attributed' as const } : i)))
+    unifiedAnalyticsApi.incidents.autoAttribute(id)
+      .then(() => setIncidents((prev) => prev.map((i) => (i.id === id ? { ...i, status: 'attributed' as const } : i))))
+      .catch((err) => console.error('Failed to assign incident:', err))
   }
 
   const handleView = (id: string) => {
@@ -118,6 +79,14 @@ export default function IncidentsPage() {
   const unattributedCount = incidents.filter((i) => i.status === 'open').length
   const attributedCount = incidents.filter((i) => i.status === 'attributed').length
   const resolvedCount = incidents.filter((i) => i.status === 'resolved').length
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">

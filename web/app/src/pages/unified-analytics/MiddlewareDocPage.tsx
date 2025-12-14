@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import {
@@ -11,8 +11,10 @@ import {
   FileCode,
   ExternalLink,
   TrendingUp,
+  Loader2,
 } from 'lucide-react'
 import { clsx } from 'clsx'
+import { unifiedAnalyticsApi } from '@/lib/api'
 
 interface MiddlewareComponent {
   id: string
@@ -37,87 +39,6 @@ interface MaintenanceLog {
   type: 'update' | 'bugfix' | 'optimization' | 'documentation'
 }
 
-const initialComponents: MiddlewareComponent[] = [
-  {
-    id: 'mw-001',
-    name: 'Firebase Crashlytics Adapter',
-    description: 'Custom API connector for ingesting crash reports into DevLake',
-    integrations: ['Firebase Crashlytics', 'DevLake'],
-    lastMaintenance: '2025-12-01T10:00:00Z',
-    maintenanceHours: 24,
-    annualBudgetHours: 40,
-    status: 'healthy',
-    documentationUrl: '/docs/middleware/firebase-adapter.md',
-    version: '2.1.0',
-  },
-  {
-    id: 'mw-002',
-    name: 'Prometheus Metrics Bridge',
-    description: 'Custom adapter for system observability metrics (latency, uptime)',
-    integrations: ['Prometheus', 'DevLake'],
-    lastMaintenance: '2025-11-15T14:00:00Z',
-    maintenanceHours: 35,
-    annualBudgetHours: 40,
-    status: 'warning',
-    documentationUrl: '/docs/middleware/prometheus-bridge.md',
-    version: '1.8.3',
-  },
-  {
-    id: 'mw-003',
-    name: 'Jira Bidirectional Sync',
-    description: 'Webhook-based synchronization for issue tracking data',
-    integrations: ['Jira', 'HR Platform', 'DevLake'],
-    lastMaintenance: '2025-12-05T09:00:00Z',
-    maintenanceHours: 18,
-    annualBudgetHours: 60,
-    status: 'healthy',
-    documentationUrl: '/docs/middleware/jira-sync.md',
-    version: '3.0.1',
-  },
-  {
-    id: 'mw-004',
-    name: 'GitLab Webhook Processor',
-    description: 'Real-time processing of GitLab events for engineering metrics',
-    integrations: ['GitLab', 'DevLake'],
-    lastMaintenance: '2025-10-20T11:00:00Z',
-    maintenanceHours: 85,
-    annualBudgetHours: 80,
-    status: 'critical',
-    documentationUrl: '/docs/middleware/gitlab-processor.md',
-    version: '2.5.2',
-  },
-]
-
-const initialLogs: MaintenanceLog[] = [
-  {
-    id: 'log-001',
-    componentId: 'mw-001',
-    description: 'Updated crash parsing logic for new Firebase SDK version',
-    hoursSpent: 8,
-    performedBy: 'Alice Johnson',
-    performedAt: '2025-12-01T10:00:00Z',
-    type: 'update',
-  },
-  {
-    id: 'log-002',
-    componentId: 'mw-004',
-    description: 'Fixed memory leak in webhook queue processing',
-    hoursSpent: 12,
-    performedBy: 'Bob Smith',
-    performedAt: '2025-11-28T14:00:00Z',
-    type: 'bugfix',
-  },
-  {
-    id: 'log-003',
-    componentId: 'mw-002',
-    description: 'Added documentation for new metric aggregation features',
-    hoursSpent: 4,
-    performedBy: 'Carol Davis',
-    performedAt: '2025-11-15T14:00:00Z',
-    type: 'documentation',
-  },
-]
-
 const statusColors = {
   healthy: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
   warning: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
@@ -132,11 +53,24 @@ const typeIcons = {
 }
 
 export default function MiddlewareDocPage() {
-  const [components] = useState<MiddlewareComponent[]>(initialComponents)
-  const [logs] = useState<MaintenanceLog[]>(initialLogs)
-
+  const [components, setComponents] = useState<MiddlewareComponent[]>([])
+  const [logs, setLogs] = useState<MaintenanceLog[]>([])
+  const [loading, setLoading] = useState(true)
   const [showRegisterModal, setShowRegisterModal] = useState(false)
   const [showLogModal, setShowLogModal] = useState(false)
+
+  useEffect(() => {
+    Promise.all([
+      unifiedAnalyticsApi.middleware.listComponents(),
+      unifiedAnalyticsApi.middleware.getMaintenanceLogs(),
+    ])
+      .then(([componentsRes, logsRes]) => {
+        setComponents(componentsRes.data)
+        setLogs(logsRes.data)
+      })
+      .catch((err) => console.error('Failed to fetch middleware data:', err))
+      .finally(() => setLoading(false))
+  }, [])
 
   const handleRegisterComponent = () => {
     setShowRegisterModal(!showRegisterModal)
@@ -161,6 +95,14 @@ export default function MiddlewareDocPage() {
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString()
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+      </div>
+    )
   }
 
   return (

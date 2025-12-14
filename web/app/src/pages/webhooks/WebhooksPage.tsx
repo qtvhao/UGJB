@@ -33,52 +33,6 @@ interface WebhookEvent {
   status: 'processed' | 'failed' | 'pending'
 }
 
-const mockWebhooks: WebhookConfig[] = [
-  {
-    id: '1',
-    name: 'GitLab Production',
-    provider: 'gitlab',
-    status: 'active',
-    lastEvent: '5 mins ago',
-    eventCount: 234,
-    url: '/webhooks/receive/1/gitlab',
-  },
-  {
-    id: '2',
-    name: 'GitHub Main Repo',
-    provider: 'github',
-    status: 'active',
-    lastEvent: '1 hour ago',
-    eventCount: 89,
-    url: '/webhooks/receive/2/github',
-  },
-  {
-    id: '3',
-    name: 'Jira Project Board',
-    provider: 'jira',
-    status: 'active',
-    lastEvent: '30 mins ago',
-    eventCount: 156,
-    url: '/webhooks/receive/3/jira',
-  },
-  {
-    id: '4',
-    name: 'CI/CD Pipeline',
-    provider: 'cicd',
-    status: 'error',
-    lastEvent: '2 hours ago',
-    eventCount: 45,
-    url: '/webhooks/receive/4/cicd',
-  },
-]
-
-const mockEvents: WebhookEvent[] = [
-  { id: '1', webhookId: '1', provider: 'gitlab', eventType: 'push', timestamp: '5 mins ago', status: 'processed' },
-  { id: '2', webhookId: '3', provider: 'jira', eventType: 'issue_updated', timestamp: '30 mins ago', status: 'processed' },
-  { id: '3', webhookId: '1', provider: 'gitlab', eventType: 'merge_request', timestamp: '1 hour ago', status: 'processed' },
-  { id: '4', webhookId: '4', provider: 'cicd', eventType: 'deployment', timestamp: '2 hours ago', status: 'failed' },
-]
-
 export default function WebhooksPage() {
   const navigate = useNavigate()
   const [webhooks, setWebhooks] = useState<WebhookConfig[]>([])
@@ -86,33 +40,16 @@ export default function WebhooksPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    async function fetchWebhooks() {
-      try {
-        setLoading(true)
-        const [configsRes, eventsRes] = await Promise.allSettled([
-          webhooksApi.configs.list(),
-          webhooksApi.events.list(),
-        ])
-
-        if (configsRes.status === 'fulfilled' && Array.isArray(configsRes.value.data)) {
-          setWebhooks(configsRes.value.data)
-        } else {
-          setWebhooks(mockWebhooks)
-        }
-
-        if (eventsRes.status === 'fulfilled' && Array.isArray(eventsRes.value.data)) {
-          setEvents(eventsRes.value.data)
-        } else {
-          setEvents(mockEvents)
-        }
-      } catch {
-        setWebhooks(mockWebhooks)
-        setEvents(mockEvents)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchWebhooks()
+    Promise.all([
+      webhooksApi.configs.list(),
+      webhooksApi.events.list(),
+    ])
+      .then(([configsRes, eventsRes]) => {
+        setWebhooks(configsRes.data)
+        setEvents(eventsRes.data)
+      })
+      .catch((err) => console.error('Failed to fetch webhooks:', err))
+      .finally(() => setLoading(false))
   }, [])
 
   const handleAddWebhook = () => {

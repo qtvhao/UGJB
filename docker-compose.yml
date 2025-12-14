@@ -1,25 +1,4 @@
 services:
-  # Nginx Reverse Proxy - Main Entry Point
-  # Development: Proxies / to Vite dev server at host.docker.internal:3000
-  # Production: Web UI container serves static files on port 8010
-  nginx-proxy:
-    image: nginx:alpine
-    ports:
-      - '8081:80'
-    volumes:
-      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./infrastructure/nginx/proxy_params:/etc/nginx/proxy_params:ro
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
-    networks:
-      - app-network
-    restart: unless-stopped
-    healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:80/health']
-      interval: 30s
-      timeout: 5s
-      retries: 3
-
   # Web UI - Production Build
   # Serves static files built with Vite
   webui:
@@ -173,14 +152,18 @@ services:
       retries: 3
 
   # API Gateway Service: Unified entry point with routing/security (Go/Gin)
+  # Replaces nginx-proxy - now handles all routing including frontend, Ollama, and Docker Registry
   api-gateway-service:
     build:
       context: ./services/system-integration/microservices/api-gateway
       dockerfile: Dockerfile
     ports:
       - '8080:8060'
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     networks:
       - app-network
+    restart: unless-stopped
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:8060/health']
       interval: 30s
