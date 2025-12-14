@@ -171,8 +171,27 @@
           "endpoints": []
         }
       ]
+    },
+    {
+      "name": "Unified-Analytics",
+      "service_name": "unified-analytics",
+      "directory": "services/unified-analytics",
+      "port": 8007,
+      "health_endpoint": "http://localhost:8007/health",
+      "domain_responsibility": "Unified dashboard configuration, incident attribution, performance reviews, and platform synchronization across Lattice, Monday.com, and DevLake.",
+      "libraries_frameworks": [],
+      "microservices": [
+        {
+          "name": "UnifiedAnalyticsAPI",
+          "responsibility": "Dashboard config, incident attribution, performance reviews, platform sync",
+          "technology": "Python 3.11, FastAPI, SQLAlchemy, Pydantic",
+          "data_ownership": "PostgreSQL",
+          "dependencies": [],
+          "endpoints": []
+        }
+      ]
     }
   ],
-  "total_services": 6,
-  "total_microservices": 13
+  "total_services": 7,
+  "total_microservices": 14
 }

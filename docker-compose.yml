@@ -226,6 +226,31 @@ services:
       retries: 3
 
 
+  # Bugsink - Self-hosted Error Tracking
+  # Captures application errors with stacktraces, alerting, and issue grouping
+  sentry:
+    image: bugsink/bugsink:latest
+    ports:
+      - '8100:8000'
+    environment:
+      - SECRET_KEY=${BUGSINK_SECRET_KEY:-change-me-in-production}
+      - CREATE_SUPERUSER=${BUGSINK_ADMIN:-admin:admin}
+      - PORT=8000
+      - BEHIND_HTTPS_PROXY=${BEHIND_HTTPS_PROXY:-False}
+    volumes:
+      - bugsink-data:/app/data
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8000/']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  bugsink-data:
