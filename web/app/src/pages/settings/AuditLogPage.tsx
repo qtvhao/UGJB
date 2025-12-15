@@ -4,6 +4,7 @@ import { ArrowLeft, Search, Filter, Download, Shield, Loader2 } from 'lucide-rea
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { useToast } from '@/components/ui/Toast'
 import { settingsApi } from '@/lib/api'
 
 interface AuditLog {
@@ -19,6 +20,7 @@ const actionTypes = ['All', 'User login', 'User logout', 'Role updated', 'Role c
 
 export default function AuditLogPage() {
   const navigate = useNavigate()
+  const { addToast } = useToast()
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedAction, setSelectedAction] = useState('All')
@@ -47,8 +49,19 @@ export default function AuditLogPage() {
       startDate: dateRange.start || undefined,
       endDate: dateRange.end || undefined,
     })
-      .then(() => alert('Audit log export started. You will receive the file shortly.'))
-      .catch((err) => console.error('Failed to export audit logs:', err))
+      .then(() => addToast({
+        type: 'success',
+        title: 'Export Started',
+        message: 'Audit log export started. You will receive the file shortly.',
+      }))
+      .catch((err) => {
+        console.error('Failed to export audit logs:', err)
+        addToast({
+          type: 'error',
+          title: 'Export Failed',
+          message: 'Failed to export audit logs. Please try again.',
+        })
+      })
   }
 
   if (loading) {
