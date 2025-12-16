@@ -259,8 +259,6 @@ services:
         - type=registry,ref=host.docker.internal:5006/ugjb-unified-analytics-api:cache
       cache_to:
         - type=registry,ref=host.docker.internal:5006/ugjb-unified-analytics-api:cache,mode=max
-    ports:
-      - '8090:8000'
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/unified_analytics
       - EMPLOYEE_REGISTRY_URL=http://employee-registry:8021
@@ -286,8 +284,6 @@ services:
   # Captures application errors with stacktraces, alerting, and issue grouping
   sentry:
     image: bugsink/bugsink:latest
-    ports:
-      - '8100:8000'
     environment:
       - SECRET_KEY=${BUGSINK_SECRET_KEY:-change-me-in-production}
       - CREATE_SUPERUSER=${BUGSINK_ADMIN:-admin:admin}
