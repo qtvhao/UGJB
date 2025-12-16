@@ -1,3 +1,8 @@
+/**
+ * Associated Frontend Files:
+ *   - web/app/src/lib/api.ts (projectsApi - lines 85-89)
+ *   - web/app/src/pages/Dashboard.tsx
+ */
 package com.ugjb.hr.allocation.service
 
 import com.ugjb.hr.allocation.entity.Project

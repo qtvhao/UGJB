@@ -1,3 +1,8 @@
+/**
+ * Associated Frontend Files:
+ *   - web/app/src/lib/api.ts (capacityApi - lines 225-239)
+ *   - web/app/src/pages/capacity/TeamCapacityPage.tsx
+ */
 package com.ugjb.hr.allocation.service
 
 import com.ugjb.hr.allocation.dto.*

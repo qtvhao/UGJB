@@ -1,6 +1,10 @@
 """
 Webhook Router for Cluster_0002
 Implements: Story 5.2 - Enable Real-Time Events
+
+Associated Frontend Files:
+  - web/app/src/lib/api.ts (webhooksApi - lines 203-212)
+  - web/app/src/pages/webhooks/WebhooksPage.tsx
 """
 from typing import Optional, Dict, Any
 from uuid import UUID

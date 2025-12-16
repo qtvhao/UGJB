@@ -1,0 +1,95 @@
+{
+  "predictions": [
+    {
+      "employee_id": "emp-001",
+      "risk_score": 0.75,
+      "risk_level": "HIGH",
+      "top_risk_factors": [
+        {
+          "factor_name": "overtime_hours",
+          "contribution_score": 0.25,
+          "description": "Excessive overtime hours detected"
+        },
+        {
+          "factor_name": "stress_level",
+          "contribution_score": 0.20,
+          "description": "High stress levels reported"
+        },
+        {
+          "factor_name": "sleep_hours_average",
+          "contribution_score": 0.15,
+          "description": "Insufficient sleep patterns"
+        }
+      ],
+      "recommendation": "High burnout risk identified. Immediate actions needed.",
+      "prediction_timestamp": "2024-01-15T10:30:00Z",
+      "model_version": "1.0.0"
+    },
+    {
+      "employee_id": "emp-002",
+      "risk_score": 0.35,
+      "risk_level": "LOW",
+      "top_risk_factors": [
+        {
+          "factor_name": "consecutive_work_days",
+          "contribution_score": 0.10,
+          "description": "Moderate consecutive work days"
+        }
+      ],
+      "recommendation": "Employee shows low burnout risk. Continue monitoring.",
+      "prediction_timestamp": "2024-01-15T10:30:00Z",
+      "model_version": "1.0.0"
+    }
+  ],
+  "healthCheck": {
+    "status": "healthy",
+    "service": "burnout-predictor",
+    "version": "1.0.0",
+    "timestamp": "2024-01-15T10:30:00Z",
+    "model_loaded": true,
+    "kafka_enabled": true
+  },
+  "modelInfo": {
+    "model_version": "1.0.0",
+    "model_type": "RandomForestClassifier",
+    "accuracy": 0.89,
+    "precision": 0.87,
+    "recall": 0.91,
+    "f1_score": 0.89,
+    "last_trained_timestamp": "2024-01-10T08:00:00Z",
+    "training_samples_count": 5000,
+    "feature_names": [
+      "hours_worked_per_week",
+      "overtime_hours",
+      "days_since_last_vacation",
+      "consecutive_work_days",
+      "average_daily_meetings",
+      "task_completion_rate",
+      "stress_level",
+      "sleep_hours_average",
+      "work_life_balance_score"
+    ]
+  },
+  "sampleMetrics": {
+    "hours_worked_per_week": 45.0,
+    "overtime_hours": 10.0,
+    "days_since_last_vacation": 60,
+    "consecutive_work_days": 12,
+    "average_daily_meetings": 4.5,
+    "task_completion_rate": 0.85,
+    "open_tasks_count": 8,
+    "overdue_tasks_count": 2,
+    "stress_level": 7.0,
+    "sleep_hours_average": 6.0,
+    "exercise_frequency": 2.0,
+    "work_life_balance_score": 5.0,
+    "productivity_score": 75.0,
+    "team_collaboration_score": 80.0,
+    "days_since_last_feedback": 30,
+    "job_satisfaction_score": 6.0,
+    "sick_days_last_month": 1,
+    "late_logins_count": 3,
+    "average_response_time_hours": 2.5,
+    "recent_performance_decline": false
+  }
+}

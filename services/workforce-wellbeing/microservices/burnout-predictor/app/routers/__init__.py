@@ -1,4 +1,9 @@
-"""Routers package for API endpoints"""
-from app.routers import health, predictions
+"""
+Routers package for API endpoints
 
-__all__ = ['health', 'predictions']
+Associated Frontend Files:
+  - web/app/src/lib/api.ts (wellbeingApi - lines 141-152)
+"""
+from app.routers import health, predictions, burnout_risks
+
+__all__ = ['health', 'predictions', 'burnout_risks']

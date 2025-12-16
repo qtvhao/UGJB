@@ -1,3 +1,10 @@
+"""
+Associated Frontend Files:
+  - web/app/src/lib/api.ts (analyticsApi - lines 92-101)
+  - web/app/src/pages/analytics/EngineeringMetricsPage.tsx
+  - web/app/src/pages/automation/AutomationRulesPage.tsx
+  - web/app/src/pages/webhooks/WebhooksPage.tsx
+"""
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import make_asgi_app

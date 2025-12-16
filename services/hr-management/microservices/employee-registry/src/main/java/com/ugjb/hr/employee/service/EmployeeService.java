@@ -1,3 +1,9 @@
+/**
+ * Associated Frontend Files:
+ *   - web/app/src/lib/api.ts (hrApi.employees - lines 54-60)
+ *   - web/app/src/pages/hr/EmployeesPage.tsx
+ *   - web/app/src/pages/hr/EmployeeProfilePage.tsx
+ */
 package com.ugjb.hr.employee.service;
 
 import com.ugjb.hr.employee.dto.*;

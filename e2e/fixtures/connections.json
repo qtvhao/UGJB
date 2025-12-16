@@ -1,0 +1,75 @@
+{
+  "connections": [
+    {
+      "id": "conn-001",
+      "name": "Jira",
+      "type": "PROJECT_MANAGEMENT",
+      "status": "ACTIVE",
+      "lastSync": "2024-01-15T10:30:00Z",
+      "syncFrequency": "15_MIN",
+      "configuration": {
+        "apiUrl": "https://company.atlassian.net",
+        "projectKey": "UGJB"
+      }
+    },
+    {
+      "id": "conn-002",
+      "name": "GitLab",
+      "type": "VERSION_CONTROL",
+      "status": "ACTIVE",
+      "lastSync": "2024-01-15T10:25:00Z",
+      "syncFrequency": "5_MIN",
+      "configuration": {
+        "apiUrl": "https://gitlab.com",
+        "groupId": "ugjb-team"
+      }
+    },
+    {
+      "id": "conn-003",
+      "name": "GitHub",
+      "type": "VERSION_CONTROL",
+      "status": "ACTIVE",
+      "lastSync": "2024-01-15T10:20:00Z",
+      "syncFrequency": "5_MIN",
+      "configuration": {
+        "organization": "ugjb-org"
+      }
+    },
+    {
+      "id": "conn-004",
+      "name": "Firebase",
+      "type": "ANALYTICS",
+      "status": "ERROR",
+      "lastSync": "2024-01-14T08:00:00Z",
+      "syncFrequency": "HOURLY",
+      "configuration": {
+        "projectId": "ugjb-analytics"
+      }
+    },
+    {
+      "id": "conn-005",
+      "name": "Slack",
+      "type": "COMMUNICATION",
+      "status": "ACTIVE",
+      "lastSync": "2024-01-15T10:00:00Z",
+      "syncFrequency": "DAILY",
+      "configuration": {
+        "workspace": "ugjb-workspace"
+      }
+    },
+    {
+      "id": "conn-006",
+      "name": "Azure DevOps",
+      "type": "PROJECT_MANAGEMENT",
+      "status": "PENDING",
+      "lastSync": null,
+      "syncFrequency": "15_MIN",
+      "configuration": {
+        "organization": "ugjb-azure"
+      }
+    }
+  ],
+  "total": 6,
+  "activeCount": 4,
+  "errorCount": 1
+}

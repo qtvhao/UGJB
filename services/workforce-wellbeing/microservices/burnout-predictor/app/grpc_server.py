@@ -1,5 +1,8 @@
 """
 gRPC server and servicer for Burnout Predictor
+
+Associated Frontend Files:
+  - web/app/src/lib/api.ts (wellbeingApi.burnoutRisk - lines 141-152)
 """
 import logging
 from datetime import datetime
@@ -164,12 +167,12 @@ class BurnoutPredictorServicer:
             return None
 
         try:
-            training_data = [
-                (_extract_metrics_from_request(sample), sample.actual_burnout_occurred)
-                for sample in request.training_data
+            records = [
+                (_extract_metrics_from_request(item), item.actual_burnout_occurred)
+                for item in request.training_data
             ]
             result = predictor_service.retrain_model(
-                training_data=training_data,
+                training_data=records,
                 validate=request.validate_before_deployment
             )
             performance = burnout_pb2.ModelPerformance(

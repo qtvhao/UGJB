@@ -1,3 +1,8 @@
+/**
+ * Associated Frontend Files:
+ *   - web/app/src/lib/api.ts (dashboardsApi - lines 215-222)
+ *   - web/app/src/pages/dashboards/CustomDashboardsPage.tsx
+ */
 import { PubSub } from 'graphql-subscriptions';
 import { v4 as uuidv4 } from 'uuid';
 

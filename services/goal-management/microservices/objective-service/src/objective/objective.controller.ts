@@ -1,3 +1,8 @@
+/**
+ * Associated Frontend Files:
+ *   - web/app/src/lib/api.ts (goalsApi.objectives - lines 105-109)
+ *   - web/app/src/pages/Dashboard.tsx
+ */
 import { Controller, Get, Post, Put, Body, Param, Query, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ObjectiveService } from './objective.service';

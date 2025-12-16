@@ -1,5 +1,9 @@
 """
 REST API endpoints for burnout predictions
+
+Associated Frontend Files:
+  - web/app/src/lib/api.ts (wellbeingApi.burnoutRisk - lines 143-147)
+  - web/app/src/pages/wellbeing/BurnoutRiskPage.tsx
 """
 from typing import List, Optional
 from datetime import datetime

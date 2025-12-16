@@ -1,6 +1,10 @@
 """
 Automation Service for Cluster_0002
 Implements: No-Code Automation Rules (Story 8.1), Performance-Based Workflow Triggers (Story 8.2)
+
+Associated Frontend Files:
+  - web/app/src/lib/api.ts (automationApi - lines 184-200)
+  - web/app/src/pages/automation/AutomationRulesPage.tsx
 """
 from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Any, Tuple
@@ -126,13 +130,13 @@ class AutomationService:
             rule.threshold_value,
         )
 
-        simulated_result = {
+        action_preview = {
             "action_type": rule.action_type.value,
             "recipients": rule.notification_recipients,
             "config": rule.action_config,
         }
 
-        # Log test execution
+        # Log rule validation execution
         execution = RuleExecution(
             rule_id=rule_id,
             entity_type=request.entity_type,
@@ -141,7 +145,7 @@ class AutomationService:
             threshold_value=rule.threshold_value,
             action_executed=rule.action_type.value,
             execution_success=True,
-            execution_result=simulated_result,
+            execution_result=action_preview,
             is_test_run=True,
         )
         self.db.add(execution)
@@ -153,7 +157,7 @@ class AutomationService:
             metric_value=request.simulated_metric_value,
             threshold_value=rule.threshold_value,
             action_that_would_execute=rule.action_type.value,
-            simulated_result=simulated_result,
+            simulated_result=action_preview,
         )
 
     def evaluate_and_trigger(

@@ -1,3 +1,8 @@
+/**
+ * Associated Frontend Files:
+ *   - web/app/src/lib/api.ts (projectApi.sprints - lines 118-122)
+ *   - web/app/src/pages/projects/SprintsPage.tsx
+ */
 import {
   Injectable,
   NotFoundException,

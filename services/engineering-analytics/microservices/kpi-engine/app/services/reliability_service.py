@@ -1,3 +1,8 @@
+"""
+Associated Frontend Files:
+  - web/app/src/lib/api.ts (analyticsApi.metrics - lines 93-97)
+  - web/app/src/pages/analytics/EngineeringMetricsPage.tsx
+"""
 from datetime import datetime
 from typing import Optional
 from dataclasses import dataclass

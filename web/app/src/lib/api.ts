@@ -238,6 +238,11 @@ export const capacityApi = {
   },
 }
 
+// Navigation Configuration
+export const navigationApi = {
+  list: () => api.get('/navigation'),
+}
+
 // Unified Analytics (Cluster 0003)
 export const unifiedAnalyticsApi = {
   // Dashboard Configuration (US06 - KPI Dashboard Customization)

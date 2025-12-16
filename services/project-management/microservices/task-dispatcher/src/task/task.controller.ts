@@ -1,3 +1,8 @@
+/**
+ * Associated Frontend Files:
+ *   - web/app/src/lib/api.ts (projectApi.tasks - lines 124-128)
+ *   - web/app/src/pages/Dashboard.tsx
+ */
 import {
   Controller,
   Get,

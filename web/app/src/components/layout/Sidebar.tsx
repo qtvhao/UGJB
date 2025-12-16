@@ -55,21 +55,20 @@ const iconMap: Record<string, LucideIcon> = {
   FileCode,
 }
 
-const defaultNavigation: NavigationItem[] = []
-
 export function Sidebar({ open, onClose }: SidebarProps) {
-  const [navigation, setNavigation] = useState<NavigationItem[]>(defaultNavigation)
+  const [navigation, setNavigation] = useState<NavigationItem[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function fetchNavigation() {
+      setLoading(true)
       try {
         const response = await api.get('/navigation')
         if (response.data && Array.isArray(response.data)) {
           setNavigation(response.data)
         }
       } catch {
-        // Navigation will remain empty if API fails
+        // Navigation will be empty if API fails
       } finally {
         setLoading(false)
       }

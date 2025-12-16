@@ -1,0 +1,19 @@
+[
+  {"name": "Dashboard", "href": "/", "icon": "LayoutDashboard"},
+  {"name": "Employees", "href": "/employees", "icon": "Users"},
+  {"name": "Skills", "href": "/skills", "icon": "BookOpen"},
+  {"name": "Assignments", "href": "/assignments", "icon": "Briefcase"},
+  {"name": "Workforce Planning", "href": "/workforce-planning", "icon": "UsersRound"},
+  {"name": "Team Capacity", "href": "/team-capacity", "icon": "Layers"},
+  {"name": "Skill Development", "href": "/skill-development", "icon": "Target"},
+  {"name": "Engineering Metrics", "href": "/engineering-metrics", "icon": "Code2"},
+  {"name": "Dashboards", "href": "/dashboards", "icon": "LayoutGrid"},
+  {"name": "Automation", "href": "/automation", "icon": "Zap"},
+  {"name": "Webhooks", "href": "/webhooks", "icon": "Webhook"},
+  {"name": "Integrations", "href": "/integrations", "icon": "Plug"},
+  {"name": "Incidents", "href": "/incidents", "icon": "AlertTriangle"},
+  {"name": "Reviews", "href": "/reviews", "icon": "FileCheck"},
+  {"name": "Platform Sync", "href": "/platform-sync", "icon": "RefreshCw"},
+  {"name": "Middleware", "href": "/middleware", "icon": "FileCode"},
+  {"name": "Settings", "href": "/settings", "icon": "Settings"}
+]

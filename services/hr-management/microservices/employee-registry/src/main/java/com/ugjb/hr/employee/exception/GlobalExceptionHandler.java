@@ -1,3 +1,8 @@
+/**
+ * Associated Frontend Files:
+ *   - web/app/src/lib/api.ts (hrApi - lines 53-82)
+ *   - web/app/src/pages/hr/EmployeesPage.tsx
+ */
 package com.ugjb.hr.employee.exception;
 
 import org.springframework.http.HttpStatus;

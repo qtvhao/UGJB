@@ -1,3 +1,7 @@
+/**
+ * Associated Frontend Files:
+ *   - web/app/src/lib/api.ts (internal health check, not directly exposed)
+ */
 package com.ugjb.hr.allocation.controller
 
 import io.swagger.v3.oas.annotations.Operation

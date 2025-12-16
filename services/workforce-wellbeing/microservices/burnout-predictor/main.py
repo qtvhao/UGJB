@@ -1,6 +1,9 @@
 """
 Main entry point for Burnout Predictor service
 Runs both FastAPI (REST) and gRPC servers
+
+Associated Frontend Files:
+  - web/app/src/lib/api.ts (wellbeingApi - lines 141-152)
 """
 import asyncio
 import logging
@@ -12,7 +15,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import predictions, health
+from app.routers import predictions, health, burnout_risks
 from app.services.predictor_service import predictor_service
 from app.grpc_server import serve_grpc
 
@@ -41,6 +44,7 @@ app.add_middleware(
 
 app.include_router(health.router)
 app.include_router(predictions.router)
+app.include_router(burnout_risks.router)
 
 
 @app.on_event("startup")

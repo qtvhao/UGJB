@@ -1,3 +1,8 @@
+/**
+ * Associated Frontend Files:
+ *   - web/app/src/lib/api.ts (integrationApi.connections - lines 132-138)
+ *   - web/app/src/pages/integrations/IntegrationsPage.tsx
+ */
 package com.ugjb.integration.route
 
 import com.fasterxml.jackson.databind.ObjectMapper

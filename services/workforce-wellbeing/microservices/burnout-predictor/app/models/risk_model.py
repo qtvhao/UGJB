@@ -1,5 +1,8 @@
 """
 Machine Learning model wrapper for burnout risk prediction
+
+Associated Frontend Files:
+  - web/app/src/lib/api.ts (wellbeingApi.burnoutRisk - lines 141-152)
 """
 import os
 import logging
@@ -59,33 +62,33 @@ class BurnoutRiskModel:
             eval_metric='auc'
         )
 
-        # Initialize with some synthetic data for demonstration
-        self._initialize_with_synthetic_data()
+        # Bootstrap model with generated training data
+        self._bootstrap_initial_model()
 
-    def _initialize_with_synthetic_data(self):
-        """Initialize model with synthetic training data for demonstration"""
-        logger.info("Initializing model with synthetic data")
+    def _bootstrap_initial_model(self):
+        """Bootstrap model with generated training data for first-run initialization"""
+        logger.info("Bootstrapping initial model")
 
         np.random.seed(42)
-        n_samples = 1000
+        n_records = 1000
 
-        # Generate synthetic features
-        X_synthetic = np.random.randn(n_samples, len(self.feature_names))
+        # Generate feature vectors
+        X_generated = np.random.randn(n_records, len(self.feature_names))
 
-        # Create synthetic labels with some logic
+        # Create labels based on feature relationships
         # Higher stress, lower sleep, more overtime -> higher burnout risk
         burnout_score = (
-            X_synthetic[:, 8] * 0.3 +  # stress_level
-            -X_synthetic[:, 9] * 0.2 +  # sleep_hours (negative correlation)
-            X_synthetic[:, 1] * 0.2 +   # overtime_hours
-            -X_synthetic[:, 11] * 0.15 + # work_life_balance (negative)
-            -X_synthetic[:, 15] * 0.15   # job_satisfaction (negative)
+            X_generated[:, 8] * 0.3 +  # stress_level
+            -X_generated[:, 9] * 0.2 +  # sleep_hours (negative correlation)
+            X_generated[:, 1] * 0.2 +   # overtime_hours
+            -X_generated[:, 11] * 0.15 + # work_life_balance (negative)
+            -X_generated[:, 15] * 0.15   # job_satisfaction (negative)
         )
-        y_synthetic = (burnout_score > 0).astype(int)
+        y_generated = (burnout_score > 0).astype(int)
 
         # Train the model
         X_train, X_test, y_train, y_test = train_test_split(
-            X_synthetic, y_synthetic, test_size=0.2, random_state=42
+            X_generated, y_generated, test_size=0.2, random_state=42
         )
 
         self.model.fit(X_train, y_train)
@@ -103,7 +106,7 @@ class BurnoutRiskModel:
         }
 
         self.last_trained = datetime.utcnow()
-        self.training_samples_count = n_samples
+        self.training_samples_count = n_records
 
         logger.info(f"Model initialized with performance: {self.performance_metrics}")
 
@@ -135,7 +138,7 @@ class BurnoutRiskModel:
             # Create directory if it doesn't exist
             os.makedirs(os.path.dirname(self.model_path), exist_ok=True)
 
-            model_data = {
+            serialized_model = {
                 'model': self.model,
                 'version': self.model_version,
                 'type': self.model_type,
@@ -145,7 +148,7 @@ class BurnoutRiskModel:
                 'feature_names': self.feature_names
             }
 
-            joblib.dump(model_data, self.model_path)
+            joblib.dump(serialized_model, self.model_path)
             logger.info(f"Model saved to {self.model_path}")
         except Exception as e:
             logger.error(f"Failed to save model: {e}")
@@ -254,7 +257,7 @@ class BurnoutRiskModel:
         y_pred = new_model.predict(X_test)
         y_pred_proba = new_model.predict_proba(X_test)[:, 1]
 
-        performance = {
+        metrics = {
             'accuracy': float(accuracy_score(y_test, y_pred)),
             'precision': float(precision_score(y_test, y_pred, zero_division=0)),
             'recall': float(recall_score(y_test, y_pred, zero_division=0)),
@@ -262,12 +265,12 @@ class BurnoutRiskModel:
             'roc_auc': float(roc_auc_score(y_test, y_pred_proba))
         }
 
-        logger.info(f"New model performance: {performance}")
+        logger.info(f"New model metrics: {metrics}")
 
         # Update model if validation passes or is not required
-        if not validate or performance['roc_auc'] >= 0.6:  # Minimum acceptable AUC
+        if not validate or metrics['roc_auc'] >= 0.6:  # Minimum acceptable AUC
             self.model = new_model
-            self.performance_metrics = performance
+            self.performance_metrics = metrics
             self.last_trained = datetime.utcnow()
             self.training_samples_count = len(training_data)
 
@@ -281,7 +284,7 @@ class BurnoutRiskModel:
         else:
             logger.warning("New model did not meet validation criteria. Keeping existing model.")
 
-        return performance
+        return metrics
 
     def _features_to_array(self, features: Dict[str, float]) -> np.ndarray:
         """Convert features dictionary to numpy array in correct order"""

@@ -1,0 +1,120 @@
+{
+  "indicators": [
+    {
+      "id": "ind-001",
+      "employee_id": "emp-001",
+      "indicator_type": "stress_level",
+      "value": 7.5,
+      "source": "survey",
+      "source_id": "survey-001",
+      "metadata": {
+        "survey_version": "1.0"
+      },
+      "recorded_at": "2024-01-15T10:00:00Z",
+      "created_at": "2024-01-15T10:00:00Z"
+    },
+    {
+      "id": "ind-002",
+      "employee_id": "emp-001",
+      "indicator_type": "sleep_hours",
+      "value": 6.0,
+      "source": "wearable",
+      "source_id": "fitbit-001",
+      "metadata": {
+        "device": "Fitbit Sense"
+      },
+      "recorded_at": "2024-01-15T08:00:00Z",
+      "created_at": "2024-01-15T08:00:00Z"
+    },
+    {
+      "id": "ind-003",
+      "employee_id": "emp-002",
+      "indicator_type": "work_life_balance",
+      "value": 8.0,
+      "source": "survey",
+      "source_id": "survey-002",
+      "metadata": {
+        "survey_version": "1.0"
+      },
+      "recorded_at": "2024-01-15T09:00:00Z",
+      "created_at": "2024-01-15T09:00:00Z"
+    }
+  ],
+  "surveys": [
+    {
+      "id": "survey-001",
+      "employee_id": "emp-001",
+      "survey_type": "weekly_wellness",
+      "survey_version": "1.0",
+      "questions": [
+        {
+          "id": "q1",
+          "text": "How stressed do you feel this week?",
+          "type": "scale"
+        },
+        {
+          "id": "q2",
+          "text": "How would you rate your work-life balance?",
+          "type": "scale"
+        }
+      ],
+      "responses": {
+        "q1": 7,
+        "q2": 5
+      },
+      "overall_score": 6.0,
+      "dimension_scores": {
+        "stress": 7.0,
+        "balance": 5.0
+      },
+      "is_completed": true,
+      "completion_percentage": 100,
+      "submitted_at": "2024-01-15T10:30:00Z",
+      "created_at": "2024-01-15T10:00:00Z"
+    }
+  ],
+  "activityLogs": [
+    {
+      "id": "log-001",
+      "employee_id": "emp-001",
+      "activity_type": "meeting",
+      "activity_category": "collaboration",
+      "duration_seconds": 3600,
+      "description": "Sprint planning meeting",
+      "source": "calendar",
+      "productivity_score": 75.0,
+      "stress_indicator": 5.0,
+      "logged_at": "2024-01-15T14:00:00Z",
+      "activity_start_time": "2024-01-15T13:00:00Z",
+      "activity_end_time": "2024-01-15T14:00:00Z"
+    },
+    {
+      "id": "log-002",
+      "employee_id": "emp-001",
+      "activity_type": "coding",
+      "activity_category": "development",
+      "duration_seconds": 7200,
+      "description": "Feature implementation",
+      "source": "vscode",
+      "productivity_score": 90.0,
+      "stress_indicator": 3.0,
+      "logged_at": "2024-01-15T17:00:00Z",
+      "activity_start_time": "2024-01-15T15:00:00Z",
+      "activity_end_time": "2024-01-15T17:00:00Z"
+    }
+  ],
+  "healthCheck": {
+    "status": "healthy",
+    "service": "wellbeing-monitor",
+    "version": "1.0.0",
+    "timestamp": "2024-01-15T10:30:00Z"
+  },
+  "aggregates": {
+    "employee_id": "emp-001",
+    "indicator_type": "stress_level",
+    "average": 6.5,
+    "minimum": 4.0,
+    "maximum": 8.5,
+    "count": 30
+  }
+}

@@ -1,3 +1,8 @@
+/**
+ * Associated Frontend Files:
+ *   - web/app/src/lib/api.ts (hrApi.assignments - lines 71-76)
+ *   - web/app/src/pages/hr/WorkforceAssignmentsPage.tsx
+ */
 package com.ugjb.hr.allocation.service
 
 import com.ugjb.hr.allocation.dto.*

@@ -1,6 +1,10 @@
 """
 Automation Rules Router for Cluster_0002
 Implements: No-Code Automation Rules (Story 8.1), Performance-Based Workflow Triggers (Story 8.2)
+
+Associated Frontend Files:
+  - web/app/src/lib/api.ts (automationApi - lines 185-200)
+  - web/app/src/pages/automation/AutomationRulesPage.tsx
 """
 from datetime import datetime
 from typing import Optional, List

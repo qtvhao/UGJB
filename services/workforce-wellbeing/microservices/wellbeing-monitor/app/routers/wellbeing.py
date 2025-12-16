@@ -1,5 +1,9 @@
 """
 REST endpoints for wellbeing data management.
+
+Associated Frontend Files:
+  - web/app/src/lib/api.ts (wellbeingApi.wellbeing - lines 148-151)
+  - web/app/src/pages/wellbeing/WellbeingPage.tsx
 """
 
 from datetime import datetime

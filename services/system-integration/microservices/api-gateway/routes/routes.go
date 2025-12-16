@@ -1,3 +1,7 @@
+// Associated Frontend Files:
+//   - web/app/src/lib/api.ts (all API route definitions)
+//   - web/app/src/components/layout/Sidebar.tsx (navigation endpoint)
+
 package routes
 
 import (
@@ -16,8 +20,82 @@ func SetupRoutes(router *gin.Engine, cfg *config.Config, logger *zap.Logger) {
 	router.GET("/health/ready", health.Ready)
 	router.GET("/health/live", health.Live)
 
+	// Navigation configuration endpoint (no authentication required)
+	navigation := handlers.NewNavigationHandler(logger)
+	router.GET("/api/navigation", navigation.GetNavigation)
+
 	// Create proxy handler
 	proxy := handlers.NewProxyHandler(cfg, logger)
+
+	// ============================================
+	// Frontend API Routes (matching frontend expectations)
+	// ============================================
+
+	// HR Management - Employee endpoints
+	hrManagement := router.Group("/api/hr-management")
+	{
+		hrManagement.GET("/employees", proxy.ProxyToService("hr_management", "/employees"))
+		hrManagement.POST("/employees", proxy.ProxyToService("hr_management", "/employees"))
+		hrManagement.GET("/employees/:id", proxy.ProxyToService("hr_management", "/employees/:id"))
+		hrManagement.PUT("/employees/:id", proxy.ProxyToService("hr_management", "/employees/:id"))
+		hrManagement.DELETE("/employees/:id", proxy.ProxyToService("hr_management", "/employees/:id"))
+		hrManagement.GET("/employees/:id/skills", proxy.ProxyToService("hr_management", "/employees/:id/skills"))
+		hrManagement.POST("/employees/:id/skills", proxy.ProxyToService("hr_management", "/employees/:id/skills"))
+
+		// Skills
+		hrManagement.GET("/skills", proxy.ProxyToService("hr_management", "/skills"))
+		hrManagement.POST("/skills", proxy.ProxyToService("hr_management", "/skills"))
+		hrManagement.GET("/skills/pending", proxy.ProxyToService("hr_management", "/skills/pending"))
+		hrManagement.POST("/skills/:id/approve", proxy.ProxyToService("hr_management", "/skills/:id/approve"))
+		hrManagement.POST("/skills/:id/reject", proxy.ProxyToService("hr_management", "/skills/:id/reject"))
+		hrManagement.GET("/skills/gaps", proxy.ProxyToService("hr_management", "/skills/gaps"))
+		hrManagement.GET("/skills/recommendations", proxy.ProxyToService("hr_management", "/skills/recommendations"))
+
+		// Assignments
+		hrManagement.GET("/assignments", proxy.ProxyToService("hr_management", "/assignments"))
+		hrManagement.POST("/assignments", proxy.ProxyToService("hr_management", "/assignments"))
+		hrManagement.GET("/assignments/:id", proxy.ProxyToService("hr_management", "/assignments/:id"))
+		hrManagement.PUT("/assignments/:id", proxy.ProxyToService("hr_management", "/assignments/:id"))
+		hrManagement.GET("/assignments/over-allocated", proxy.ProxyToService("hr_management", "/assignments/over-allocated"))
+		hrManagement.POST("/assignments/resolve/:employeeId", proxy.ProxyToService("hr_management", "/assignments/resolve/:employeeId"))
+
+		// Learning Paths
+		hrManagement.GET("/learning-paths", proxy.ProxyToService("hr_management", "/learning-paths"))
+		hrManagement.GET("/learning-paths/:id", proxy.ProxyToService("hr_management", "/learning-paths/:id"))
+		hrManagement.POST("/learning-paths/:id/enroll", proxy.ProxyToService("hr_management", "/learning-paths/:id/enroll"))
+
+		// Capacity
+		hrManagement.GET("/capacity/teams", proxy.ProxyToService("hr_management", "/capacity/teams"))
+		hrManagement.GET("/capacity/team/:id", proxy.ProxyToService("hr_management", "/capacity/team/:id"))
+		hrManagement.POST("/capacity/team/:id/export", proxy.ProxyToService("hr_management", "/capacity/team/:id/export"))
+		hrManagement.GET("/capacity/employees", proxy.ProxyToService("hr_management", "/capacity/employees"))
+		hrManagement.GET("/capacity/employee/:id", proxy.ProxyToService("hr_management", "/capacity/employee/:id"))
+		hrManagement.GET("/capacity/alerts/over-allocated", proxy.ProxyToService("hr_management", "/capacity/alerts/over-allocated"))
+		hrManagement.GET("/capacity/alerts/under-utilized", proxy.ProxyToService("hr_management", "/capacity/alerts/under-utilized"))
+	}
+
+	// System Integration - Connections endpoints
+	systemIntegration := router.Group("/api/system-integration")
+	{
+		systemIntegration.GET("/connections", proxy.ProxyToService("system_integration", "/connections"))
+		systemIntegration.POST("/connections", proxy.ProxyToService("system_integration", "/connections"))
+		systemIntegration.GET("/connections/:id", proxy.ProxyToService("system_integration", "/connections/:id"))
+		systemIntegration.PUT("/connections/:id", proxy.ProxyToService("system_integration", "/connections/:id"))
+		systemIntegration.DELETE("/connections/:id", proxy.ProxyToService("system_integration", "/connections/:id"))
+		systemIntegration.POST("/connections/:id/sync", proxy.ProxyToService("system_integration", "/connections/:id/sync"))
+		systemIntegration.GET("/connections/:id/status", proxy.ProxyToService("system_integration", "/connections/:id/status"))
+	}
+
+	// Workforce Wellbeing - Burnout Risk endpoints
+	workforceWellbeing := router.Group("/api/workforce-wellbeing")
+	{
+		workforceWellbeing.GET("/burnout-risks", proxy.ProxyToService("workforce_wellbeing", "/burnout-risks"))
+		workforceWellbeing.GET("/burnout-risks/:employeeId", proxy.ProxyToService("workforce_wellbeing", "/burnout-risks/:employeeId"))
+
+		// Indicators and Surveys
+		workforceWellbeing.GET("/indicators", proxy.ProxyToService("workforce_wellbeing", "/indicators"))
+		workforceWellbeing.POST("/surveys", proxy.ProxyToService("workforce_wellbeing", "/surveys"))
+	}
 
 	// ============================================
 	// External Services (no authentication)

@@ -1,3 +1,8 @@
+/**
+ * Associated Frontend Files:
+ *   - web/app/src/lib/api.ts (goalsApi.keyResults - lines 111-113)
+ *   - web/app/src/pages/Dashboard.tsx
+ */
 import {
   Controller,
   Get,

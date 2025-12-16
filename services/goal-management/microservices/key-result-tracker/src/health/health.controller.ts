@@ -1,3 +1,7 @@
+/**
+ * Associated Frontend Files:
+ *   - web/app/src/lib/api.ts (internal health check, not directly exposed)
+ */
 import { Controller, Get } from '@nestjs/common';
 import {
   HealthCheck,

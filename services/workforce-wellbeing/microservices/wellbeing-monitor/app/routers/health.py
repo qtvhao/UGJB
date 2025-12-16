@@ -1,5 +1,9 @@
 """
 Health check endpoints for Wellbeing Monitor microservice.
+
+Associated Frontend Files:
+  - web/app/src/lib/api.ts (health checks via api-gateway)
+  - web/app/src/components/layout/Sidebar.tsx (system status display)
 """
 
 from datetime import datetime

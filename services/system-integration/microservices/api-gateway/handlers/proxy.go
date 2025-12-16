@@ -1,3 +1,7 @@
+// Associated Frontend Files:
+//   - web/app/src/lib/api.ts (all API calls route through this proxy)
+//   - web/app/src/App.tsx (main application entry point)
+
 package handlers
 
 import (

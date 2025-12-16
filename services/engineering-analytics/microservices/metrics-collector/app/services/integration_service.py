@@ -1,3 +1,8 @@
+"""
+Associated Frontend Files:
+  - web/app/src/lib/api.ts (integrationApi.connections - lines 132-139)
+  - web/app/src/pages/integrations/IntegrationsPage.tsx
+"""
 from datetime import datetime
 from typing import List, Optional
 from uuid import UUID

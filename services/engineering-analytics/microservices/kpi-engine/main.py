@@ -1,3 +1,8 @@
+"""
+Associated Frontend Files:
+  - web/app/src/lib/api.ts (analyticsApi.kpi - lines 98-100)
+  - web/app/src/pages/analytics/EngineeringMetricsPage.tsx
+"""
 import grpc
 from concurrent import futures
 from datetime import datetime

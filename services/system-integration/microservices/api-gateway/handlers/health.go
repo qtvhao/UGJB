@@ -1,3 +1,7 @@
+// Associated Frontend Files:
+//   - web/app/src/lib/api.ts (health checks via gateway)
+//   - web/app/src/components/layout/Sidebar.tsx (system status display)
+
 package handlers
 
 import (

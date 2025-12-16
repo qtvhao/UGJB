@@ -1,0 +1,137 @@
+{
+  "activities": [
+    {
+      "id": "act-001",
+      "employee_id": "emp-001",
+      "activity_type": "commit",
+      "source": "gitlab",
+      "metadata": {
+        "repository": "ugjb-frontend",
+        "branch": "feature/dark-mode",
+        "message": "Add dark mode toggle component"
+      },
+      "timestamp": "2024-01-15T14:30:00Z",
+      "created_at": "2024-01-15T14:30:00Z"
+    },
+    {
+      "id": "act-002",
+      "employee_id": "emp-001",
+      "activity_type": "pull_request",
+      "source": "gitlab",
+      "metadata": {
+        "repository": "ugjb-frontend",
+        "title": "Feature: Dark mode implementation",
+        "status": "merged"
+      },
+      "timestamp": "2024-01-15T16:00:00Z",
+      "created_at": "2024-01-15T16:00:00Z"
+    },
+    {
+      "id": "act-003",
+      "employee_id": "emp-002",
+      "activity_type": "code_review",
+      "source": "gitlab",
+      "metadata": {
+        "repository": "ugjb-backend",
+        "pull_request_id": "123",
+        "comments_count": 5
+      },
+      "timestamp": "2024-01-15T15:00:00Z",
+      "created_at": "2024-01-15T15:00:00Z"
+    }
+  ],
+  "metrics": [
+    {
+      "id": "metric-001",
+      "metric_type": "deployment_frequency",
+      "value": 4.5,
+      "unit": "deployments_per_day",
+      "period_start": "2024-01-08T00:00:00Z",
+      "period_end": "2024-01-15T00:00:00Z",
+      "metadata": {
+        "environment": "production",
+        "team": "platform"
+      }
+    },
+    {
+      "id": "metric-002",
+      "metric_type": "lead_time",
+      "value": 24.5,
+      "unit": "hours",
+      "period_start": "2024-01-08T00:00:00Z",
+      "period_end": "2024-01-15T00:00:00Z",
+      "metadata": {
+        "from": "commit",
+        "to": "production"
+      }
+    },
+    {
+      "id": "metric-003",
+      "metric_type": "change_failure_rate",
+      "value": 0.08,
+      "unit": "percentage",
+      "period_start": "2024-01-08T00:00:00Z",
+      "period_end": "2024-01-15T00:00:00Z",
+      "metadata": {
+        "total_deployments": 25,
+        "failed_deployments": 2
+      }
+    },
+    {
+      "id": "metric-004",
+      "metric_type": "mttr",
+      "value": 1.5,
+      "unit": "hours",
+      "period_start": "2024-01-08T00:00:00Z",
+      "period_end": "2024-01-15T00:00:00Z",
+      "metadata": {
+        "incidents_count": 3
+      }
+    }
+  ],
+  "automationRules": [
+    {
+      "id": "rule-001",
+      "name": "High overtime alert",
+      "description": "Alert when employee overtime exceeds threshold",
+      "trigger": {
+        "metric": "overtime_hours",
+        "condition": "greater_than",
+        "threshold": 10
+      },
+      "action": {
+        "type": "notification",
+        "channel": "slack",
+        "recipients": ["#hr-alerts"]
+      },
+      "status": "active",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  ],
+  "webhooks": [
+    {
+      "id": "webhook-001",
+      "source": "gitlab",
+      "event_type": "push",
+      "endpoint": "/api/v1/webhooks/gitlab",
+      "secret": "***",
+      "status": "active",
+      "last_triggered": "2024-01-15T14:30:00Z"
+    },
+    {
+      "id": "webhook-002",
+      "source": "jira",
+      "event_type": "issue_update",
+      "endpoint": "/api/v1/webhooks/jira",
+      "secret": "***",
+      "status": "active",
+      "last_triggered": "2024-01-15T12:00:00Z"
+    }
+  ],
+  "healthCheck": {
+    "status": "healthy",
+    "service": "metrics-collector",
+    "version": "1.0.0",
+    "timestamp": "2024-01-15T10:30:00Z"
+  }
+}

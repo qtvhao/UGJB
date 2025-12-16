@@ -1,5 +1,9 @@
 """
 Health check endpoints for burnout predictor service
+
+Associated Frontend Files:
+  - web/app/src/lib/api.ts (health checks via api-gateway)
+  - web/app/src/components/layout/Sidebar.tsx (system status display)
 """
 from datetime import datetime
 from typing import Dict

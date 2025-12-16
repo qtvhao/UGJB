@@ -1,3 +1,8 @@
+/**
+ * Associated Frontend Files:
+ *   - web/app/src/lib/api.ts (health checks via api-gateway)
+ *   - web/app/src/components/layout/Sidebar.tsx (system status display)
+ */
 package com.ugjb.integration.controller
 
 import org.springframework.boot.actuate.health.Health

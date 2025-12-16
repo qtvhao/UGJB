@@ -22,6 +22,10 @@ services:
     build:
       context: ./services/engineering-analytics/microservices/metrics-collector
       dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/ugjb-metrics-collector:cache
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/ugjb-metrics-collector:cache,mode=max
     networks:
       - app-network
     healthcheck:
@@ -35,6 +39,10 @@ services:
     build:
       context: ./services/engineering-analytics/microservices/kpi-engine
       dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/ugjb-kpi-engine:cache
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/ugjb-kpi-engine:cache,mode=max
     networks:
       - app-network
     healthcheck:
@@ -48,6 +56,10 @@ services:
     build:
       context: ./services/engineering-analytics/microservices/insights-dashboard
       dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/ugjb-insights-dashboard:cache
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/ugjb-insights-dashboard:cache,mode=max
     networks:
       - app-network
     healthcheck:
@@ -62,6 +74,10 @@ services:
     build:
       context: ./services/goal-management/microservices/objective-service
       dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/ugjb-objective-service:cache
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/ugjb-objective-service:cache,mode=max
     networks:
       - app-network
     healthcheck:
@@ -75,6 +91,10 @@ services:
     build:
       context: ./services/goal-management/microservices/key-result-tracker
       dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/ugjb-key-result-tracker:cache
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/ugjb-key-result-tracker:cache,mode=max
     networks:
       - app-network
     healthcheck:
@@ -89,6 +109,10 @@ services:
     build:
       context: ./services/hr-management/microservices/employee-registry
       dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/ugjb-employee-registry:cache
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/ugjb-employee-registry:cache,mode=max
     networks:
       - app-network
     healthcheck:
@@ -102,6 +126,10 @@ services:
     build:
       context: ./services/hr-management/microservices/allocation-engine
       dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/ugjb-allocation-engine:cache
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/ugjb-allocation-engine:cache,mode=max
     networks:
       - app-network
     healthcheck:
@@ -116,6 +144,10 @@ services:
     build:
       context: ./services/project-management/microservices/sprint-coordinator
       dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/ugjb-sprint-coordinator:cache
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/ugjb-sprint-coordinator:cache,mode=max
     networks:
       - app-network
     healthcheck:
@@ -129,6 +161,10 @@ services:
     build:
       context: ./services/project-management/microservices/task-dispatcher
       dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/ugjb-task-dispatcher:cache
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/ugjb-task-dispatcher:cache,mode=max
     networks:
       - app-network
     healthcheck:
@@ -143,6 +179,10 @@ services:
     build:
       context: ./services/system-integration/microservices/data-pipeline
       dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/ugjb-data-pipeline:cache
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/ugjb-data-pipeline:cache,mode=max
     networks:
       - app-network
     healthcheck:
@@ -157,6 +197,10 @@ services:
     build:
       context: ./services/system-integration/microservices/api-gateway
       dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/ugjb-api-gateway-service:cache
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/ugjb-api-gateway-service:cache,mode=max
     ports:
       - '8080:8060'
     extra_hosts:
@@ -176,6 +220,10 @@ services:
     build:
       context: ./services/workforce-wellbeing/microservices/wellbeing-monitor
       dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/ugjb-wellbeing-monitor:cache
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/ugjb-wellbeing-monitor:cache,mode=max
     networks:
       - app-network
     healthcheck:
@@ -189,6 +237,10 @@ services:
     build:
       context: ./services/workforce-wellbeing/microservices/burnout-predictor
       dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/ugjb-burnout-predictor:cache
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/ugjb-burnout-predictor:cache,mode=max
     networks:
       - app-network
     healthcheck:
@@ -203,6 +255,10 @@ services:
     build:
       context: ./services/unified-analytics/microservices/unified-analytics-api
       dockerfile: Dockerfile
+      cache_from:
+        - type=registry,ref=host.docker.internal:5006/ugjb-unified-analytics-api:cache
+      cache_to:
+        - type=registry,ref=host.docker.internal:5006/ugjb-unified-analytics-api:cache,mode=max
     ports:
       - '8090:8000'
     environment:

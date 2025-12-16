@@ -1,3 +1,8 @@
+/**
+ * Associated Frontend Files:
+ *   - web/app/src/lib/api.ts (integrationApi - lines 131-139)
+ *   - web/app/src/pages/integrations/IntegrationsPage.tsx
+ */
 package com.ugjb.integration
 
 import org.springframework.boot.autoconfigure.SpringBootApplication

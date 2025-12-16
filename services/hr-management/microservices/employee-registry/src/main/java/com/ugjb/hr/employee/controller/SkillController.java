@@ -1,3 +1,10 @@
+/**
+ * Associated Frontend Files:
+ *   - web/app/src/lib/api.ts (hrApi.skills - lines 62-69)
+ *   - web/app/src/pages/hr/SkillsInventoryPage.tsx
+ *   - web/app/src/pages/hr/PendingSkillsPage.tsx
+ *   - web/app/src/pages/hr/SkillDevelopmentPage.tsx
+ */
 package com.ugjb.hr.employee.controller;
 
 import com.ugjb.hr.employee.dto.PageResponse;
