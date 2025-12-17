@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import wellbeingMonitorFixture from '../../fixtures/wellbeing_monitor.json';
+import wellbeingMonitorFixture from '../../../fixtures/workforce-wellbeing/wellbeing-monitor/wellbeing_monitor.json';
 
 /**
  * E2E tests for Wellbeing Monitor service

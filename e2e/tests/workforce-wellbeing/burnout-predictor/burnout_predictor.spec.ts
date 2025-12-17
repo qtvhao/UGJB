@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import burnoutPredictorFixture from '../../fixtures/burnout_predictor.json';
+import burnoutPredictorFixture from '../../../fixtures/workforce-wellbeing/burnout-predictor/burnout_predictor.json';
 
 /**
  * E2E tests for Burnout Predictor service

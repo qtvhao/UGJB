@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import metricsCollectorFixture from '../../fixtures/metrics_collector.json';
+import metricsCollectorFixture from '../../../fixtures/engineering-analytics/metrics-collector/metrics_collector.json';
 
 /**
  * E2E tests for Metrics Collector service

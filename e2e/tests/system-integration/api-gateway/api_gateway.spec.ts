@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import apiGatewayFixture from '../../fixtures/api_gateway.json';
+import apiGatewayFixture from '../../../fixtures/system-integration/api-gateway/api_gateway.json';
 
 /**
  * E2E tests for API Gateway service
