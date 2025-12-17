@@ -1,0 +1,24 @@
+{
+  "healthCheck": {
+    "status": "healthy",
+    "service": "unified-analytics-api",
+    "version": "1.0.0",
+    "timestamp": "2025-12-17T13:15:06.034497Z"
+  },
+  "endpoints": [
+    {
+      "path": "/api/v1/unified_analytics_api",
+      "method": "GET",
+      "description": "Get Unified Analytics Api data",
+      "status": "active"
+    }
+  ],
+  "mockData": {
+    "sample": {
+      "id": "sample-001",
+      "name": "Sample Unified Analytics Api Item",
+      "status": "active",
+      "createdAt": "2025-12-17T13:15:06.034542Z"
+    }
+  }
+}

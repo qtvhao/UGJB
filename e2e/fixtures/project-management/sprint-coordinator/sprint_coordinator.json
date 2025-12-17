@@ -1,0 +1,24 @@
+{
+  "healthCheck": {
+    "status": "healthy",
+    "service": "sprint-coordinator",
+    "version": "1.0.0",
+    "timestamp": "2025-12-17T13:15:06.035328Z"
+  },
+  "endpoints": [
+    {
+      "path": "/api/v1/sprint_coordinator",
+      "method": "GET",
+      "description": "Get Sprint Coordinator data",
+      "status": "active"
+    }
+  ],
+  "mockData": {
+    "sample": {
+      "id": "sample-001",
+      "name": "Sample Sprint Coordinator Item",
+      "status": "active",
+      "createdAt": "2025-12-17T13:15:06.035330Z"
+    }
+  }
+}
